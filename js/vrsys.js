@@ -1,6 +1,7 @@
 var envId ="dxwvr-1e2175" ;
 var ename = null;
 var efile = null;
+var user = null;
 var fileInput = document.getElementById("file");
 var uploadButton = document.getElementById("upload");
 var fileBoxList = document.getElementById("fileBox");
@@ -39,7 +40,7 @@ function getCookie(cname){
 //password
 //_id
 function checkCookieVideoList(){
-  var user=getCookie("username");
+  user=getCookie("username");
   if (user){
     
     //欢迎该用户登录
@@ -51,16 +52,19 @@ function checkCookieVideoList(){
         .get()
         .then(function (res) {
             if(fileIDList = res.data[0].fileID){
-                //通过fileID遍历该用户上传的所有文件并生成下载链接
+                //通过fileID遍历该用户上传的所有文件并获取下载链接
                 for(var i=0; i<fileIDList.length; i++){
                     app.getTempFileURL({fileList:[fileIDList[i]]})
                     .then(res2=>{
-                        //动态生成html元素并压入fileboxList的栈中
+                        //动态生成html元素并压入：
+
+                        //获得文件下载链接 url 和 文件名 fileName
                         var fileObj = res2.fileList[0];
                         var url = fileObj.tempFileURL;
                         var temparray = url.split('/');
                         var fileName = temparray.pop();//get the name from fileID
                         
+                        //生成字面为fileName的文件链接
                         var anode =document.createElement("a");
                         var hrefnode=document.createAttribute("href");
                         hrefnode.nodeValue=`${url}`;
@@ -68,13 +72,25 @@ function checkCookieVideoList(){
                         anode.attributes.setNamedItem(hrefnode);
                         anode.appendChild(textnode);
                         
+                        //生成对应文件的删除按钮
+                        var buttonnode = document.createElement("button");
+                        var textbuttonnode=document.createTextNode("Delete");       
+                        buttonnode.appendChild(textbuttonnode);
+                        buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID)}, false);
+                   
+
+                        //将所有元素压入表格的一行当中
                         var trnode =document.createElement("tr");
                         var tdnode =document.createElement("td");
+                        var tdnode2 =document.createElement("td");
                         var tbodynode =document.createElement("tbody");
                         tdnode.appendChild(anode);
+                        tdnode2.appendChild(buttonnode);
                         trnode.appendChild(tdnode);
-                        tbodynode.appendChild(trnode);
+                        trnode.appendChild(tdnode2);
+                        tbodynode.appendChild(trnode);                       
                         fileBoxList.appendChild (tbodynode);
+
                     });
                 }
             }//fileID list is null
@@ -90,6 +106,19 @@ function checkCookieVideoList(){
     }
 }
 
+function deleteFile(tempfileID){
+    const _ = db.command;
+    //delete file from storage
+    app.deleteFile({fileList:[tempfileID]}).then((res)=>{window.alert("Delete success!")});
+
+    //delete fileID from database
+  //  userCollection.where({name:user})
+   // .update({fileID:_.remove(tempfileID)}) //maybe wrong
+    //.then(function (res) {
+    //});
+
+}
+
 //get file and name of file
 function getFile(e){
     e.stopPropagation();
@@ -100,8 +129,6 @@ function getFile(e){
 
 //upload file
 function upload(){
-    var user=getCookie("username");
-
     if(ename && efile){
         app.uploadFile({
             //文件的绝对路径，包含文件名
@@ -132,3 +159,4 @@ function upload(){
     else
         window.alert("Upload Failed");
 }
+
