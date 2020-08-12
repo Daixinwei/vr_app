@@ -58,11 +58,13 @@ function checkCookieVideoList(){
                         //动态生成html元素并压入fileboxList的栈中
                         var fileObj = res2.fileList[0];
                         var url = fileObj.tempFileURL;
- 
+                        var temparray = url.split('/');
+                        var fileName = temparray.pop();//get the name from fileID
+                        
                         var anode =document.createElement("a");
                         var hrefnode=document.createAttribute("href");
                         hrefnode.nodeValue=`${url}`;
-                        var textnode=document.createTextNode(`${url}`);                          
+                        var textnode=document.createTextNode(`${fileName}`);                          
                         anode.attributes.setNamedItem(hrefnode);
                         anode.appendChild(textnode);
                         
@@ -117,10 +119,14 @@ function upload(){
         }).then(res=>{
             //写入对应用户的json文档里
             const _=db.command;
-            userCollection.where({name:user})
-            .update({fileID:_.push(res.fileID)})
-            .then(function (res2) {
-            });
+            userCollection.where({fileID:res.fileID}).get().then(res2=>{
+                if(res2.data.length == 0){
+                    userCollection.where({name:user})
+                    .update({fileID:_.push(res.fileID)})
+                    .then(function (res2) {
+                    });
+                }
+            });    
         });   
     }
     else
