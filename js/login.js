@@ -13,6 +13,7 @@ const db = app.database();
 
 var nameInput = document.getElementById("user");
 var pwdInput = document.getElementById("password");
+var loginButton = document.getElementById("login");
 
 /*set cookie */
 function setCookie(csubwin,cname,cvalue,exdays){
@@ -24,8 +25,8 @@ function setCookie(csubwin,cname,cvalue,exdays){
 
 function login(){
 	var uname = nameInput.value;
-	var pwd = pwdInput.value;
-	
+	var pwd = md5(pwdInput.value);
+
 	//avoid throw error when the 'uname' collection does not exist in tcb database
 	const tempuserlist = ["temp01","temp02","admin"];//edit when update collections in tcb database
 	if(tempuserlist.indexOf(uname) == -1){
@@ -58,3 +59,8 @@ function login(){
 	});		
 }
 
+function keylogin(){
+	if(event.keyCode == 13){
+		loginButton.click();
+	}
+}
