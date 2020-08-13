@@ -21,7 +21,7 @@ if(!auth.hasLoginState()) {
 }
 
 const db =app.database();
-const userCollection=db.collection("vrUser");
+var userCollection;
 
 function getCookie(cname){
     var name = cname + "=";
@@ -33,28 +33,21 @@ function getCookie(cname){
     return "";
 }
 
-//check chookie and video list of user,from the newset user name
-//string variables in 'vrUSer' json file:
-//fileID
-//name
-//password
-//_id
+//*****check chookie and video list of user when onload vrsys.html
 function checkCookieVideoList(){
-  user=getCookie("username");
-  if (user){
-    
-    //欢迎该用户登录
-    //alert("Welcome " + user + " access");  
-
-    //从数据库获取该用户上传的文件的fileID所组成的string数组
-    var fileIDList = null;
-    userCollection.where({name:user})
+    user = getCookie("username");
+    userCollection = db.collection(user);
+    const _ = db.command;
+    if (user){       //如果cookie中有记录用户名字则加载该用户的文件列表   
+        userCollection.where({type:"file", fileID:_.neq(null)})
         .get()
         .then(function (res) {
-            if(fileIDList = res.data[0].fileID){
-                //通过fileID遍历该用户上传的所有文件并获取下载链接
-                for(var i=0; i<fileIDList.length; i++){
-                    app.getTempFileURL({fileList:[fileIDList[i]]})
+            if(res.data.length == 0){
+                fileNoticeSpan.innerHTML="No file uploaded.";
+            }
+            else{
+                for(var i=0;i<res.data.length;i++){
+                    app.getTempFileURL({fileList:[res.data[i].fileID]})
                     .then(res2=>{
                         //动态生成html元素并压入：
 
@@ -78,7 +71,6 @@ function checkCookieVideoList(){
                         buttonnode.appendChild(textbuttonnode);
                         buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID)}, false);
                    
-
                         //将所有元素压入表格的一行当中
                         var trnode =document.createElement("tr");
                         var tdnode =document.createElement("td");
@@ -90,33 +82,23 @@ function checkCookieVideoList(){
                         trnode.appendChild(tdnode2);
                         tbodynode.appendChild(trnode);                       
                         fileBoxList.appendChild (tbodynode);
-
                     });
                 }
-            }//fileID list is null
-            else{
-
-                fileNoticeSpan.innerHTML="No file uploaded.";
             }
         });
     }
-    else{
+    else{//该用户未登录
         alert("Please login!");
         window.open("login.html","_self");
     }
 }
 
 function deleteFile(tempfileID){
-    const _ = db.command;
-    //delete file from storage
-    app.deleteFile({fileList:[tempfileID]}).then((res)=>{window.alert("Delete success!")});
-
-    //delete fileID from database
-  //  userCollection.where({name:user})
-   // .update({fileID:_.remove(tempfileID)}) //maybe wrong
-    //.then(function (res) {
-    //});
-
+    //删除文件
+    app.deleteFile({fileList:[tempfileID]})
+    .then(res=>{alert("Delete success!\nRefresh the page to refresh your files list.")});
+    //从该用户的集合删除形容该文件的文档
+    userCollection.where({type:"file", fileID:tempfileID}).remove();
 }
 
 //get file and name of file
@@ -140,17 +122,18 @@ function upload(){
                 console.log(percentCompleted);
                 
                 //when upload finished to
-                window.alert("Upload Success!\nRefresh the page to refresh your files list.");//alert
-                
+                window.alert("Upload Success!\nRefresh the page to refresh your files list.");//alert               
               }
         }).then(res=>{
             //写入对应用户的json文档里
             const _=db.command;
             userCollection.where({fileID:res.fileID}).get().then(res2=>{
-                if(res2.data.length == 0){
-                    userCollection.where({name:user})
-                    .update({fileID:_.push(res.fileID)})
-                    .then(function (res2) {
+                if(res2.data.length == 0){//if the fileID is not recorded in the collection
+                    userCollection.add({
+                        type:"file",
+                        fileID: res.fileID
+                    })
+                    .then(function (res3) {   
                     });
                 }
             });    
