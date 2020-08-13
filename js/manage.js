@@ -4,7 +4,6 @@ var user = null;
 var fileBoxList = document.getElementById("fileBox");
 var fileNoticeSpan = document.getElementById("filenotice");
 
-
 const app =tcb.init({
     env:envId
   });
@@ -32,7 +31,6 @@ function getCookie(cname){
 //*****check chookie and video list of user when onload vrsys.html
 async function checkCookieAlluserVideoList(){
     user = getCookie("username");
-    userCollection = db.collection(user);
     const _ = db.command;
     
     if (user=="admin"){       
@@ -44,12 +42,8 @@ async function checkCookieAlluserVideoList(){
             await ucollection.where({type:"file", fileID:_.neq(null)})
             .get()
             .then(async function (res) {
-                if(res.data.length == 0){
-                    fileNoticeSpan.innerHTML="No file uploaded.";
-                }
-                else{
+                if(res.data.length > 0){
                     for(var j=0;j<res.data.length;j++){
-                        console.log(res.data[j].fileID);
                         await app.getTempFileURL({fileList:[res.data[j].fileID]})
                         .then(function(res2){
                             //动态生成html元素并压入：
@@ -69,23 +63,49 @@ async function checkCookieAlluserVideoList(){
                             var textnode=document.createTextNode(`${un} / ${fileName}`);                          
                             anode.attributes.setNamedItem(hrefnode);
                             anode.appendChild(textnode);
+                            var tdanode =document.createElement("td");
+                            tdanode.appendChild(anode);
                             
                             //生成对应文件的删除按钮
                             var buttonnode = document.createElement("button");
-                            var textbuttonnode=document.createTextNode("Delete");       
+                            var textbuttonnode=document.createTextNode("Delete");  
+                            buttonnode.setAttribute("class","btn btn-success");     
                             buttonnode.appendChild(textbuttonnode);
-                            buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID, ucollection)}, false);
-                       
+                            buttonnode.addEventListener("click", function(){deleteFile(fileObj.fileID, un)}, false);
+
+                            var tdeletenode =document.createElement("td");
+                            tdeletenode.appendChild(buttonnode);
+
+                            //生成对应文件的留言栏
+                            var trcommentnode = document.createElement("tr");
+                            var tdcommentnode = document.createElement("td");
+                            var inputnode =  document.createElement("input");
+                            
+                            tdcommentnode.appendChild(inputnode);
+                            inputnode.setAttribute("type","text");
+                            inputnode.setAttribute("placeholder","Give Comment");
+                            inputnode.setAttribute("class","form-control");
+                            ucollection.where({type:"file", fileID:fileObj.fileID}).get()
+                            .then(res3=>{
+                               // console.log(res3.data);
+                                var tcoment;
+                                tcoment=res3.data[0].ct;
+                                if(tcoment)
+                                    inputnode.value=tcoment;         
+                            });
+                            inputnode.addEventListener("change", function(){giveComment(fileObj.fileID, un,inputnode.value)}, false);
+
                             //将所有元素压入表格的一行当中
-                            var trnode =document.createElement("tr");
-                            var tdnode =document.createElement("td");
-                            var tdnode2 =document.createElement("td");
+                            var trmainnode =document.createElement("tr");
                             var tbodynode =document.createElement("tbody");
-                            tdnode.appendChild(anode);
-                            tdnode2.appendChild(buttonnode);
-                            trnode.appendChild(tdnode);
-                            trnode.appendChild(tdnode2);
-                            tbodynode.appendChild(trnode);                       
+                          
+                            trmainnode.appendChild(tdanode);
+                            trmainnode.appendChild(tdeletenode);
+                            trcommentnode.appendChild(tdcommentnode);
+
+                            tbodynode.appendChild(trmainnode);  
+                            tbodynode.appendChild(trcommentnode);    
+
                             fileBoxList.appendChild (tbodynode);
                         });
                     }
@@ -100,13 +120,15 @@ async function checkCookieAlluserVideoList(){
     }
 }
 
-function deleteFile(tempfileID, userCollection){
+function deleteFile(tfileID, tusername){
     //删除文件
-    app.deleteFile({fileList:[tempfileID]})
+    app.deleteFile({fileList:[tfileID]})
     .then(res=>{alert("Delete success!\nRefresh the page to refresh your files list.")});
     //从该用户的集合删除形容该文件的文档
-    userCollection.where({type:"file", fileID:tempfileID}).remove();
+    db.collection(tusername).where({type:"file", fileID:tfileID}).remove();
 }
 
-
+function giveComment(tfileID, tusername, tcomment){
+    db.collection(tusername).where({type:"file", fileID:tfileID}).update({ct:tcomment});
+}
 

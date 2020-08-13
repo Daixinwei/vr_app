@@ -67,20 +67,41 @@ function checkCookieVideoList(){
                         
                         //生成对应文件的删除按钮
                         var buttonnode = document.createElement("button");
-                        var textbuttonnode=document.createTextNode("Delete");       
+                        var textbuttonnode=document.createTextNode("Delete");    
+                        buttonnode.setAttribute("class","btn btn-success");     
                         buttonnode.appendChild(textbuttonnode);
                         buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID)}, false);
                    
+                        //生成留言板
+                        var textcommentnode=document.createTextNode("");
+                        userCollection.where({type:"file", fileID:fileObj.fileID}).get()
+                        .then(res3=>{
+                            var tcoment;
+                            tcoment=res3.data[0].ct;
+                            console.log(tcoment);
+                            if(tcoment)
+                                textcommentnode.nodeValue = "Comment: " + tcoment;         
+                        });
+
                         //将所有元素压入表格的一行当中
-                        var trnode =document.createElement("tr");
+                        var trnode = document.createElement("tr");
+                        var trcommentnode = document.createElement("tr");
                         var tdnode =document.createElement("td");
                         var tdnode2 =document.createElement("td");
+                        var tdcommentnode =document.createElement("td");
                         var tbodynode =document.createElement("tbody");
+
                         tdnode.appendChild(anode);
                         tdnode2.appendChild(buttonnode);
+                        tdcommentnode.appendChild(textcommentnode);
+
                         trnode.appendChild(tdnode);
                         trnode.appendChild(tdnode2);
-                        tbodynode.appendChild(trnode);                       
+                        trcommentnode.appendChild(tdcommentnode);
+                        
+                        tbodynode.appendChild(trnode);     
+                        tbodynode.appendChild(trcommentnode);    
+
                         fileBoxList.appendChild (tbodynode);
                     });
                 }
