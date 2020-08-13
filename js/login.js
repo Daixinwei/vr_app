@@ -27,7 +27,7 @@ function login(){
 	var pwd = pwdInput.value;
 	
 	//avoid throw error when the 'uname' collection does not exist in tcb database
-	const tempuserlist = ["temp01","temp02"];//edit when update collections in tcb database
+	const tempuserlist = ["temp01","temp02","admin"];//edit when update collections in tcb database
 	if(tempuserlist.indexOf(uname) == -1){
 		alert("ID does not exist");
 		return;
@@ -45,7 +45,10 @@ function login(){
 					  else						//密码正确
 					{
 						//window.location.href='vrsys.html?name='+uname+'&psw='+pwd;
-						subwin = window.open("vrsys.html","_self");
+						if(uname=="admin")
+							subwin = window.open("manage.html","_self");
+						else
+							subwin = window.open("vrsys.html","_self");
 						setCookie(subwin,"username",uname,7); //set username to cookie
 						console.info("success");
 					}
