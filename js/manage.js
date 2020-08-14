@@ -123,9 +123,12 @@ async function checkCookieAlluserVideoList(){
 function deleteFile(tfileID, tusername){
     //删除文件
     app.deleteFile({fileList:[tfileID]})
-    .then(res=>{alert("Delete success!\nRefresh the page to refresh your files list.")});
-    //从该用户的集合删除形容该文件的文档
-    db.collection(tusername).where({type:"file", fileID:tfileID}).remove();
+    .then(res=>{alert("Delete success!")
+         db.collection(tusername).where({type:"file", fileID:tfileID}).remove() //从该用户的集合删除形容该文件的文档
+         .then(res2=>{
+            location.reload(); 
+         });
+    });       
 }
 
 function giveComment(tfileID, tusername, tcomment){

@@ -20,13 +20,16 @@
       <path>
         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
         <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:origin/dev" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </select>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95071cdc-17bf-4147-b308-8f44773429f5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/manage.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/manage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/vrsys.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/vrsys.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,6 +99,17 @@
                   <entry key="Show.Git.Branches" value="true" />
                 </map>
               </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/dev" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
             </State>
           </value>
         </entry>
@@ -107,21 +121,29 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="1540" y="123" width="1720" height="857" key="DiffContextDialog" timestamp="1597393055261">
+    <state x="1540" y="123" width="1720" height="857" key="DiffContextDialog" timestamp="1597404657694">
       <screen x="1440" y="23" width="1920" height="1057" />
     </state>
-    <state x="1540" y="123" width="1720" height="857" key="DiffContextDialog/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597393055261" />
+    <state x="1540" y="123" width="1720" height="857" key="DiffContextDialog/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597404657694" />
     <state x="1824" y="190" width="1450" height="723" key="MergeDialog" timestamp="1597391936586">
       <screen x="1440" y="23" width="1920" height="1057" />
     </state>
     <state x="1824" y="190" width="1450" height="723" key="MergeDialog/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597391936586" />
-    <state x="2000" y="291" key="Vcs.Push.Dialog.v2" timestamp="1597395410160">
+    <state x="1540" y="123" width="1720" height="857" key="ShowDiffWithBranchDialog" timestamp="1597404657695">
       <screen x="1440" y="23" width="1920" height="1057" />
     </state>
-    <state x="2000" y="291" key="Vcs.Push.Dialog.v2/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597395410160" />
-    <state x="2213" y="472" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1597395062578">
+    <state x="1540" y="123" width="1720" height="857" key="ShowDiffWithBranchDialog/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597404657695" />
+    <state x="2221" y="256" key="VCS.ChangeListViewerDialog" timestamp="1597404308911">
       <screen x="1440" y="23" width="1920" height="1057" />
     </state>
-    <state x="2213" y="472" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597395062578" />
+    <state x="2221" y="256" key="VCS.ChangeListViewerDialog/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597404308911" />
+    <state x="2000" y="291" key="Vcs.Push.Dialog.v2" timestamp="1597404527726">
+      <screen x="1440" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2000" y="291" key="Vcs.Push.Dialog.v2/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597404527726" />
+    <state x="2213" y="472" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1597404533095">
+      <screen x="1440" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2213" y="472" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1440.23.1920.1057/0.23.1440.877@1440.23.1920.1057" timestamp="1597404533095" />
   </component>
 </project>

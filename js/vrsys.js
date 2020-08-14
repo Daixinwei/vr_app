@@ -59,6 +59,8 @@ function checkCookieVideoList(){
                         //获得文件下载链接 url 和 文件名 fileName
                         var fileObj = res2.fileList[0];
                         var url = fileObj.tempFileURL;
+                        console.log(url);
+
                         var temparray = url.split('/');
                         var fileName = temparray.pop();//get the name from fileID
                         
@@ -69,7 +71,18 @@ function checkCookieVideoList(){
                         var textnode=document.createTextNode(`${fileName}`);                          
                         anode.attributes.setNamedItem(hrefnode);
                         anode.appendChild(textnode);
-                        
+
+                        //视频缩略图（只支持mp4类型的文件）
+                        var videonode= document.createElement("video");
+                        videonode.setAttribute("width", "150px");
+                        videonode.setAttribute("height", "100px");
+                        videonode.setAttribute("controls", "controls");
+                        var sourcenode = document.createElement("source");
+                        sourcenode.setAttribute("src", url);
+                        sourcenode.setAttribute("type", "video/mp4");
+                        anode.appendChild(videonode);
+                        videonode.appendChild(sourcenode);
+
                         //生成对应文件的删除按钮
                         var buttonnode = document.createElement("button");
                         var textbuttonnode=document.createTextNode("Delete");    
@@ -121,9 +134,13 @@ function checkCookieVideoList(){
 function deleteFile(tempfileID){
     //删除文件
     app.deleteFile({fileList:[tempfileID]})
-    .then(res=>{alert("Delete success!\nRefresh the page to refresh your files list.")});
-    //从该用户的集合删除形容该文件的文档
-    userCollection.where({type:"file", fileID:tempfileID}).remove();
+    .then(res=>{
+        alert("Delete success!");
+        //从该用户的集合删除形容该文件的文档
+        userCollection.where({type:"file", fileID:tempfileID}).remove();
+        location.reload(); 
+    });
+   
 }
 
 //get file and name of file
@@ -146,9 +163,11 @@ function upload(){
             onUploadProgress: function (progressEvent) {
                 console.log(progressEvent);
                 var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                console.log(percentCompleted)
                 //when upload finished to
-                alert("Upload Success!\nRefresh the page to refresh your files list.");//alert    
-                remindspan.innerHTML = "";   
+                alert("Upload Success!");//alert    
+                remindspan.innerHTML = "";  
+                
               }
         }).then(res=>{
             //写入对应用户的json文档里
@@ -161,6 +180,7 @@ function upload(){
                         fileID: res.fileID
                     })
                     .then(function (res3) {   
+                        location.reload(); 
                     });
                 }
             });    
