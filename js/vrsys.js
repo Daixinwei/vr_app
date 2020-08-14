@@ -1,16 +1,22 @@
-var envId ="dxwvr-1e2175" ;
+var envId ="dxwvr-1e2175";
+
 var ename = null;
 var efile = null;
+
 var user = null;
+var userCollection = null;
+
 var fileInput = document.getElementById("file");
 var uploadButton = document.getElementById("upload");
 var fileBoxList = document.getElementById("fileBox");
 var fileNoticeSpan = document.getElementById("filenotice");
-fileInput.addEventListener("change", this.getFile.bind(this), false)
-uploadButton.addEventListener("click", this.upload.bind(this), false)
+var remindspan = document.getElementById("remind");
+fileInput.addEventListener("change", this.getFile.bind(this), false);
+uploadButton.addEventListener("click", this.upload.bind(this), false);
+
 const app =tcb.init({
     env:envId
-  });
+});
 
 var auth = app.auth({
     persistence: "local"
@@ -21,11 +27,10 @@ if(!auth.hasLoginState()) {
 }
 
 const db =app.database();
-var userCollection;
 
 function getCookie(cname){
     var name = cname + "=";
-  var ca = document.cookie.split(';');
+    var ca = document.cookie.split(';');
     for(var i=0; i<ca.length; i++) {
         var c = ca[i].trim();
         if (c.indexOf(name)==0) { return c.substring(name.length,c.length); }
@@ -48,8 +53,8 @@ function checkCookieVideoList(){
             else{
                 for(var i=0;i<res.data.length;i++){
                     app.getTempFileURL({fileList:[res.data[i].fileID]})
-                    .then(res2=>{
-                        //动态生成html元素并压入：
+                    .then(res2=>{ //动态生成html元素并压入：
+                        
 
                         //获得文件下载链接 url 和 文件名 fileName
                         var fileObj = res2.fileList[0];
@@ -78,12 +83,11 @@ function checkCookieVideoList(){
                         .then(res3=>{
                             var tcoment;
                             tcoment=res3.data[0].ct;
-                            console.log(tcoment);
                             if(tcoment)
                                 textcommentnode.nodeValue = "Comment: " + tcoment;         
                         });
 
-                        //将所有元素压入表格的一行当中
+                        //将所有元素压入表格的一个trbody当中
                         var trnode = document.createElement("tr");
                         var trcommentnode = document.createElement("tr");
                         var tdnode =document.createElement("td");
@@ -132,22 +136,24 @@ function getFile(e){
 
 //upload file
 function upload(){
-    if(ename && efile){
+    if(ename && efile){  
+        remindspan.innerHTML = "Uploading, please wait.";
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
             //要上传的文件对象
             filePath: efile,
             onUploadProgress: function (progressEvent) {
+                console.log(progressEvent);
                 var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                console.log(percentCompleted);
-                
                 //when upload finished to
-                window.alert("Upload Success!\nRefresh the page to refresh your files list.");//alert               
+                alert("Upload Success!\nRefresh the page to refresh your files list.");//alert    
+                remindspan.innerHTML = "";   
               }
         }).then(res=>{
             //写入对应用户的json文档里
             const _=db.command;
+            
             userCollection.where({fileID:res.fileID}).get().then(res2=>{
                 if(res2.data.length == 0){//if the fileID is not recorded in the collection
                     userCollection.add({
