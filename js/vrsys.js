@@ -1,3 +1,7 @@
+/*-----------------
+Used in vrsys.html
+-------------------*/
+
 var envId ="dxwvr-1e2175";
 
 var ename = null;
@@ -137,10 +141,10 @@ function deleteFile(tempfileID){
     .then(res=>{
         alert("Delete success!");
         //从该用户的集合删除形容该文件的文档
-        userCollection.where({type:"file", fileID:tempfileID}).remove();
-        location.reload(); 
-    });
-   
+        userCollection.where({type:"file", fileID:tempfileID}).remove().then(res=>{
+            location.reload(); 
+        });
+    });  
 }
 
 //get file and name of file
@@ -190,3 +194,5 @@ function upload(){
         window.alert("Upload Failed");
 }
 
+//check cookie and the video list of this user when load the page(window)
+window.addEventListener("load",checkCookieVideoList,false);

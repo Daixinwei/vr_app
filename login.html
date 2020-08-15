@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" charset="utf-8"/>
     <title>Video Report System Ver.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- 引入 Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
@@ -40,7 +41,7 @@
 
     </style>
 </head>
-<body onKeyDown = "keylogin()">
+<body>
 <div class="container center-in-center">
     <h1 align="center">Interaction Lab</h1>
     <h2 align="center">Video Report System</h2>
@@ -61,7 +62,7 @@
     <div class="row form-group col-md-offset-4">
         <br>
         <div class="col-md-offset-2 col-md-2">
-            <button type="submit" class="btn btn-primary btn-lg" id="login" onclick="login()" style="text-shadow: black 3px 2px 2px">Sign In</button>
+            <button type="submit" class="btn btn-primary btn-lg" id="login" style="text-shadow: black 3px 2px 2px">Sign In</button>
         </div>
     </div>
 </div>

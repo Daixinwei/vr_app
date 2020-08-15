@@ -1,3 +1,6 @@
+/*-----------------
+Used in manage.html
+-------------------*/
 var envId ="dxwvr-1e2175" ;
 var user = null;
 
@@ -135,3 +138,5 @@ function giveComment(tfileID, tusername, tcomment){
     db.collection(tusername).where({type:"file", fileID:tfileID}).update({ct:tcomment});
 }
 
+//check cookie and the video list of this user when load the page(window)
+window.addEventListener("load",checkCookieAlluserVideoList,false);

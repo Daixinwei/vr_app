@@ -5,28 +5,32 @@
             <title>InoueLab Daily Video Report</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">     
             <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-           
+            <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <![endif]-->
             <script src="https://code.jquery.com/jquery.js"></script>
             <script src="js/bootstrap.min.js"></script>
             <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
             
             <script src="//imgcache.qq.com/qcloud/tcbjs/1.9.0/tcb.js"></script>
         </head>
-
-        <body onload = "checkCookieVideoList()">   
+        <body>  
           <div class="container"> 
+            
             <div class="container col-md-6 ">
               <h4>Your Files List</h4>
               <table class="table table-hover" id="fileBox">
                 <!--<tbody><tr><td><a href="">...</a></td></tr></tbody>
                 <tbody><tr><td><a href="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/2020-06-05 at 10-07-37.mp4">
                    <video width="400" controls="controls" preload="auto">
-                   <source src="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/2020-06-05 at 10-07-37.mp4" type="video/mp4">-->
-              </video>
-            </a></td></tr></tbody>
+                   <source src="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/2020-06-05 at 10-07-37.mp4" type="video/mp4">
+                   </video>
+                 </a></td></tr></tbody>-->
               </table>
               <span id="filenotice"></span>     
             </div>
+
              <div class="container col-md-6 ">
                 <h4>Choose your video</h4>
                 <div class="form-group">
@@ -35,6 +39,7 @@
                 <button type="submit" class="btn btn-success" id="upload">Upload</button>
                 <span id="remind"></span>
             </div>
+
           </div>
         </body>
         <script src="js/vrsys.js"></script>
