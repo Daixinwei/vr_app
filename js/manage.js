@@ -35,8 +35,8 @@ function getCookie(cname){
 async function checkCookieAlluserVideoList(){
     user = getCookie("username");
     const _ = db.command;
-    
-    if (user=="admin"){       
+    const tempmanagerlist = ["admin01","admin02"];
+    if (tempmanagerlist.indexOf(user) != -1){       
         const tempuserlist = ["temp01","temp02"];//users' ID. edit when update collections in tcb database
         //如果cookie中有记录用户名字则加载该用户的文件列表 
         for(var i=0; i<tempuserlist.length;i++){

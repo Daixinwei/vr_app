@@ -28,9 +28,10 @@ loginButton.addEventListener("click", login, false);
 function login(){
 	var uname = nameInput.value;
 	var pwd = md5(pwdInput.value);
+	console.log(pwd);
 
 	//avoid throw in Promise error when the 'uname' collection does not exist in tcb database
-	const tempuserlist = ["temp01","temp02","admin"];      //edit when update user or admin collections in tcb database
+	const tempuserlist = ["temp01","temp02","admin01","admin02"];      //edit when update user or admin collections in tcb database
 
 	//if user does not input ID or the ID is wrong, over this function
 	if(tempuserlist.indexOf(uname) == -1){
@@ -50,7 +51,7 @@ function login(){
 					else{						 //password correct
 						var subwin = null;
 						//window.location.href='vrsys.html?name='+uname+'&psw='+pwd;
-						if(uname=="admin")
+						if(uname=="admin01"|| uname =="admin02")
 							subwin = window.open("manage.html","_self");
 						else
 							subwin = window.open("vrsys.html","_self");

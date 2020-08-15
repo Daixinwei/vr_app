@@ -46,11 +46,10 @@ function getCookie(cname){
 //*****check chookie and video list of user when onload vrsys.html
 function checkCookieVideoList(){
     user = getCookie("username");
-    const _ = db.command;
+    const _ = db.command;    
     const tempuserlist = ["temp01","temp02"];
     if (tempuserlist.indexOf(user) != -1){       //如果cookie中有记录用户名字则加载该用户的文件列表   
         userCollection = db.collection(user);
-        
         userCollection.where({type:"file", fileID:_.neq(null)})
         .get()
         .then(function (res) {
@@ -171,12 +170,8 @@ function upload(){
             filePath: efile,
             onUploadProgress: function (progressEvent) {
                 console.log(progressEvent);
-                var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                
-                //when upload finished to
-             
-                //remindspan.innerHTML = "";  
-                
+                var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);                
+                //when upload finished to               
               }
         }).then(res=>{
             //写入对应用户的json文档里
