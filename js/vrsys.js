@@ -10,6 +10,7 @@ var efile = null;
 var user = null;
 var userCollection = null;
 
+
 var fileInput = document.getElementById("file");
 var uploadButton = document.getElementById("upload");
 var fileBoxList = document.getElementById("fileBox");
@@ -161,18 +162,31 @@ function getFile(e){
 function upload(){
     if(ename && efile){  
        // remindspan.innerHTML = "Uploading, please wait.";
-       uploadProgressBar.value = 0;
-       test();
+       // uploadProgressBar.value = 0;
+        var value=0;
+        progress(value);
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
             //要上传的文件对象
             filePath: efile,
+<<<<<<< HEAD
             onUploadProgress: function (progressEvent) {
                 console.log(progressEvent);
                 var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);                
                 //when upload finished to               
               }
+=======
+            // onUploadProgress: function (progressEvent) {
+            //     // console.log(progressEvent);
+            //     // var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            //     // console.log(percentCompleted)
+            //     //when upload finished to
+            //
+            //     //remindspan.innerHTML = "";
+            //
+            //   }
+>>>>>>> 8819c322573c9748d9ab2069b8cde45626f7695c
         }).then(res=>{
             //写入对应用户的json文档里
             const _=db.command;
@@ -183,15 +197,20 @@ function upload(){
                         type:"file",
                         fileID: res.fileID
                     })
-                    .then(function (res3) {   
-                        uploadProgressBar.value =  uploadProgressBar.max;
-                        alert("Upload Success!");//alert    
-                        location.reload(); 
+                    .then(function (res3) {
+                        remindspan.innerText=100+"%";
+                        $("#uploadProgress").css("width", "100%");
+                        setTimeout(function(){
+                            alert("Upload Success!");
+                            location.reload();
+                            },
+                            1500);
+
                     });
                 }
                 else{
-                    uploadProgressBar.value =  uploadProgressBar.max; 
                     alert("The file has existed!")
+                    location.reload();
                     }
             });    
         });   
@@ -203,10 +222,22 @@ function upload(){
 //check cookie and the video list of this user when load the page(window)
 window.addEventListener("load",checkCookieVideoList,false);
 
-function test(){
-    if(uploadProgressBar.value<uploadProgressBar.max)
-        uploadProgressBar.value += 1
-    else
-         return ""   
-    setTimeout("test()", 20)
+function progress(value) {
+    if (value < 50) {
+        value += 1;
+        $("#uploadProgress").css("width", value + "%");
+        // remindspan.innerText=value+"%";
+        setTimeout("progress("+value+")", 20);
+    }else if (value>=50 && value<85){
+        value += 1;
+        $("#uploadProgress").css("width", value + "%");
+        // remindspan.innerText=value+"%";
+        setTimeout("progress("+value+")", 40);
+    }else if (value>=85 && value<99){
+        value += 1;
+        $("#uploadProgress").css("width", value + "%");
+        // remindspan.innerText=value+"%";
+        setTimeout("progress("+value+")", 60);
+    }
+    else return"";
 }
