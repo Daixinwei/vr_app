@@ -28,7 +28,6 @@ loginButton.addEventListener("click", login, false);
 function login(){
 	var uname = nameInput.value;
 	var pwd = md5(pwdInput.value);
-	console.log(pwd);
 
 	//avoid throw in Promise error when the 'uname' collection does not exist in tcb database
 	const tempuserlist = ["temp01","temp02","admin01","admin02"];      //edit when update user or admin collections in tcb database

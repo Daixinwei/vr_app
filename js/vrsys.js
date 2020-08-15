@@ -15,7 +15,6 @@ var fileInput = document.getElementById("file");
 var uploadButton = document.getElementById("upload");
 var fileBoxList = document.getElementById("fileBox");
 var fileNoticeSpan = document.getElementById("filenotice");
-var remindspan = document.getElementById("remind");
 var uploadProgressBar = document.getElementById("uploadProgress");
 fileInput.addEventListener("change", this.getFile.bind(this), false);
 uploadButton.addEventListener("click", this.upload.bind(this), false);
@@ -58,75 +57,69 @@ function checkCookieVideoList(){
                 fileNoticeSpan.innerHTML="No file uploaded.";
             }
             else{
+                
                 for(var i=0;i<res.data.length;i++){
+                    var date = res.data[i].date; //*在这获取文件上传的日期
+                    var comment = res.data[i].ct; //*在这获取文件的评论
+                    var commentby = res.data[i].ctby; //*在这获取文件的评论者
                     app.getTempFileURL({fileList:[res.data[i].fileID]})
-                    .then(res2=>{ //动态生成html元素并压入：
-                        
+                    .then(res2=>{ 
+                        //动态生成文件内容并压入
 
-                        //获得文件下载链接 url 和 文件名 fileName
+                        //获得文件下载链接 url
                         var fileObj = res2.fileList[0];
                         var url = fileObj.tempFileURL;
-                        console.log(url);
 
-                        var temparray = url.split('/');
-                        var fileName = temparray.pop();//get the name from fileID
-                        
-                        //生成字面为fileName的文件链接
-                        var anode =document.createElement("a");
-                        var hrefnode=document.createAttribute("href");
-                        hrefnode.nodeValue=`${url}`;
-                        var textnode=document.createTextNode(`${fileName}`);                          
-                        anode.attributes.setNamedItem(hrefnode);
-                        anode.appendChild(textnode);
+                            //视频缩略图（<video><source></source></video>,只支持mp4类型的文件）
+                            var videonode= document.createElement("video");
+                            videonode.setAttribute("width", "100%");
+                            videonode.setAttribute("controls", "controls");
 
-                        //视频缩略图（只支持mp4类型的文件）
-                        var videonode= document.createElement("video");
-                        videonode.setAttribute("width", "150px");
-                        videonode.setAttribute("height", "100px");
-                        videonode.setAttribute("controls", "controls");
-                        var sourcenode = document.createElement("source");
-                        sourcenode.setAttribute("src", url);
-                        sourcenode.setAttribute("type", "video/mp4");
-                        anode.appendChild(videonode);
-                        videonode.appendChild(sourcenode);
+                            var sourcenode = document.createElement("source");
+                            sourcenode.setAttribute("src", url);
+                            sourcenode.setAttribute("type", "video/mp4");
+                            videonode.appendChild(sourcenode);
+                    
+                            //生成Date和Comment
+                            var hdatenode = document.createElement("h4");
+                            hdatenode.innerHTML = "Date: " + date;
 
-                        //生成对应文件的删除按钮
-                        var buttonnode = document.createElement("button");
-                        var textbuttonnode=document.createTextNode("Delete");    
-                        buttonnode.setAttribute("class","btn btn-success");     
-                        buttonnode.appendChild(textbuttonnode);
-                        buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID)}, false);
-                   
-                        //生成留言板
-                        var textcommentnode=document.createTextNode("");
-                        userCollection.where({type:"file", fileID:fileObj.fileID}).get()
-                        .then(res3=>{
-                            var tcoment;
-                            tcoment=res3.data[0].ct;
-                            if(tcoment)
-                                textcommentnode.nodeValue = "Comment: " + tcoment;         
-                        });
+                            var pcommentnode = document.createElement("p");
+                            var strongnode = document.createElement("strong");
+                            strongnode.innerHTML = "Comment: ";
+                            var textcommentnode=document.createTextNode(comment);
+                            pcommentnode.appendChild(strongnode);
+                            if(comment)
+                                pcommentnode.appendChild(textcommentnode);
+                            else
+                                pcommentnode.innerHTML = "No Comment";
 
-                        //将所有元素压入表格的一个trbody当中
-                        var trnode = document.createElement("tr");
-                        var trcommentnode = document.createElement("tr");
-                        var tdnode =document.createElement("td");
-                        var tdnode2 =document.createElement("td");
-                        var tdcommentnode =document.createElement("td");
-                        var tbodynode =document.createElement("tbody");
+                            //生成对应文件的删除按钮(<p><button></button><p>)
+                            var pbuttonnode = document.createElement("p");
+                            var buttonnode = document.createElement("button");
+                            var textbuttonnode=document.createTextNode("Delete");    
+                            buttonnode.appendChild(textbuttonnode);
+                            pbuttonnode.appendChild(buttonnode);
+                            buttonnode.setAttribute("class","btn btn-primary");  
+                            pbuttonnode.setAttribute("class","text-right");     
+                            buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID)}, false);
 
-                        tdnode.appendChild(anode);
-                        tdnode2.appendChild(buttonnode);
-                        tdcommentnode.appendChild(textcommentnode);
+                            //生成外部div（idivnod & odivnode）
+                            var odivnode = document.createElement("div");
+                            var idivnode = document.createElement("div");
 
-                        trnode.appendChild(tdnode);
-                        trnode.appendChild(tdnode2);
-                        trcommentnode.appendChild(tdcommentnode);
-                        
-                        tbodynode.appendChild(trnode);     
-                        tbodynode.appendChild(trcommentnode);    
+                        //将以上所有元素压入idivnode，idivnode压入odivnode
+                        idivnode.appendChild(videonode);
+                        idivnode.appendChild(hdatenode);
+                        idivnode.appendChild(pcommentnode);
+                        idivnode.appendChild(pbuttonnode);
+                        odivnode.setAttribute("class","col-md-6");
+                        idivnode.setAttribute("class","thumbnail");
+                        idivnode.setAttribute("style","padding: 15px");
+                        odivnode.appendChild(idivnode);
 
-                        fileBoxList.appendChild (tbodynode);
+                        //将一个文件内容压入 filebox
+                        fileBoxList.appendChild (odivnode);
                     });
                 }
             }
@@ -161,32 +154,16 @@ function getFile(e){
 //upload file
 function upload(){
     if(ename && efile){  
-       // remindspan.innerHTML = "Uploading, please wait.";
-       // uploadProgressBar.value = 0;
         var value=0;
         progress(value);
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
             //要上传的文件对象
-            filePath: efile,
-<<<<<<< HEAD
-            onUploadProgress: function (progressEvent) {
-                console.log(progressEvent);
-                var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);                
-                //when upload finished to               
-              }
-=======
+            filePath: efile
             // onUploadProgress: function (progressEvent) {
             //     // console.log(progressEvent);
             //     // var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            //     // console.log(percentCompleted)
-            //     //when upload finished to
-            //
-            //     //remindspan.innerHTML = "";
-            //
-            //   }
->>>>>>> 8819c322573c9748d9ab2069b8cde45626f7695c
         }).then(res=>{
             //写入对应用户的json文档里
             const _=db.command;
@@ -195,10 +172,10 @@ function upload(){
                 if(res2.data.length == 0){//if the fileID is not recorded in the collection
                     userCollection.add({
                         type:"file",
-                        fileID: res.fileID
+                        fileID: res.fileID,
+                        date: getUploadDate()
                     })
                     .then(function (res3) {
-                        remindspan.innerText=100+"%";
                         $("#uploadProgress").css("width", "100%");
                         setTimeout(function(){
                             alert("Upload Success!");
@@ -240,4 +217,20 @@ function progress(value) {
         setTimeout("progress("+value+")", 60);
     }
     else return"";
+}
+
+function getUploadDate(){
+    var date = new Date();
+	var sep = "-";
+	var year = date.getFullYear(); //获取完整的年份(4位)
+	var month = date.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+	var day = date.getDate(); //获取当前日
+	if (month <= 9) {
+		month = "0" + month;
+	}
+	if (day <= 9) {
+		day = "0" + day;
+	}
+	var currentdate = year + sep + month + sep + day;
+	return currentdate;
 }

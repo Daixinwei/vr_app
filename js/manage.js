@@ -135,7 +135,7 @@ function deleteFile(tfileID, tusername){
 }
 
 function giveComment(tfileID, tusername, tcomment){
-    db.collection(tusername).where({type:"file", fileID:tfileID}).update({ct:tcomment});
+    db.collection(tusername).where({type:"file", fileID:tfileID}).update({ct:tcomment, ctby:user});
 }
 
 //check cookie and the video list of this user when load the page(window)
