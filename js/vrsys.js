@@ -46,9 +46,11 @@ function getCookie(cname){
 //*****check chookie and video list of user when onload vrsys.html
 function checkCookieVideoList(){
     user = getCookie("username");
-    userCollection = db.collection(user);
     const _ = db.command;
-    if (user){       //如果cookie中有记录用户名字则加载该用户的文件列表   
+    const tempuserlist = ["temp01","temp02"];
+    if (tempuserlist.indexOf(user) != -1){       //如果cookie中有记录用户名字则加载该用户的文件列表   
+        userCollection = db.collection(user);
+        
         userCollection.where({type:"file", fileID:_.neq(null)})
         .get()
         .then(function (res) {
@@ -160,7 +162,8 @@ function getFile(e){
 function upload(){
     if(ename && efile){  
        // remindspan.innerHTML = "Uploading, please wait.";
-       test()
+       uploadProgressBar.value = 0;
+       test();
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
@@ -186,13 +189,14 @@ function upload(){
                         fileID: res.fileID
                     })
                     .then(function (res3) {   
-                        uploadProgressBar.value = uploadProgressBar.max;
+                        uploadProgressBar.value =  uploadProgressBar.max;
                         alert("Upload Success!");//alert    
                         location.reload(); 
                     });
                 }
                 else{
-                     alert("The file has existed!")
+                    uploadProgressBar.value =  uploadProgressBar.max; 
+                    alert("The file has existed!")
                     }
             });    
         });   
