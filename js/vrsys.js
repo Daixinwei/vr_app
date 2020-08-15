@@ -15,6 +15,7 @@ var uploadButton = document.getElementById("upload");
 var fileBoxList = document.getElementById("fileBox");
 var fileNoticeSpan = document.getElementById("filenotice");
 var remindspan = document.getElementById("remind");
+var uploadProgressBar = document.getElementById("uploadProgress");
 fileInput.addEventListener("change", this.getFile.bind(this), false);
 uploadButton.addEventListener("click", this.upload.bind(this), false);
 
@@ -158,7 +159,8 @@ function getFile(e){
 //upload file
 function upload(){
     if(ename && efile){  
-        remindspan.innerHTML = "Uploading, please wait.";
+       // remindspan.innerHTML = "Uploading, please wait.";
+       test()
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
@@ -167,10 +169,10 @@ function upload(){
             onUploadProgress: function (progressEvent) {
                 console.log(progressEvent);
                 var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                console.log(percentCompleted)
+                
                 //when upload finished to
-                alert("Upload Success!");//alert    
-                remindspan.innerHTML = "";  
+             
+                //remindspan.innerHTML = "";  
                 
               }
         }).then(res=>{
@@ -184,9 +186,14 @@ function upload(){
                         fileID: res.fileID
                     })
                     .then(function (res3) {   
+                        uploadProgressBar.value = uploadProgressBar.max;
+                        alert("Upload Success!");//alert    
                         location.reload(); 
                     });
                 }
+                else{
+                     alert("The file has existed!")
+                    }
             });    
         });   
     }
@@ -196,3 +203,11 @@ function upload(){
 
 //check cookie and the video list of this user when load the page(window)
 window.addEventListener("load",checkCookieVideoList,false);
+
+function test(){
+    if(uploadProgressBar.value<uploadProgressBar.max)
+        uploadProgressBar.value += 1
+    else
+         return ""   
+    setTimeout("test()", 20)
+}
