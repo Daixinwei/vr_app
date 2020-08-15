@@ -15,10 +15,29 @@
             
             <script src="//imgcache.qq.com/qcloud/tcbjs/1.9.0/tcb.js"></script>
         </head>
-        <body>  
-          <div class="container"> 
-            
-            <div class="container col-md-6 ">
+        <body>
+            <div class="container">
+                <h1 align="center">Upload Your Video</h1>
+                <div style="margin: 50px auto">
+                    <div class="form-group">
+                        <input type="file" name="file" id="file" class="center-block">
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-success btn-lg" id="upload" style="text-shadow: black 2px 1px 1px">Upload</button>
+                    <br>
+                    <span id="remind">
+                        <div class="progress progress-striped active">
+	                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" id="uploadProgress" aria-valuemax="100" style="width:0" >
+                            </div>
+                        </div>
+<!--                          <progress  value=“0” max="100">-->
+<!--                          </progress>-->
+                      </span>
+                </div>
+            </div>
+
+          <div class="container">
+            <div class="container">
               <h4>Your Files List</h4>
               <table class="table table-hover" id="fileBox">
                 <!--<tbody><tr><td><a href="">...</a></td></tr></tbody>
@@ -29,18 +48,6 @@
                  </a></td></tr></tbody>-->
               </table>
               <span id="filenotice"></span>     
-            </div>
-
-             <div class="container col-md-6 ">
-                <h4>Choose your video</h4>
-                <div class="form-group">
-                   <input type="file" name="file" id="file">
-                </div>  
-                <button type="submit" class="btn btn-success" id="upload">Upload</button>
-                <span id="remind">
-                  <progress id="uploadProgress" value=“0” max="100">
-                  </progress>
-              </span>
             </div>
 
           </div>

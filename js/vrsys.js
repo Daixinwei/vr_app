@@ -160,19 +160,20 @@ function getFile(e){
 
 //upload file
 function upload(){
+    var value=0
     if(ename && efile){  
        // remindspan.innerHTML = "Uploading, please wait.";
-       uploadProgressBar.value = 0;
-       test();
+       // uploadProgressBar.value = 0;
+        progress(value);
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
             //要上传的文件对象
             filePath: efile,
             onUploadProgress: function (progressEvent) {
-                console.log(progressEvent);
+                // console.log(progressEvent);
                 var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                
+                // console.log(percentCompleted)
                 //when upload finished to
              
                 //remindspan.innerHTML = "";  
@@ -188,15 +189,15 @@ function upload(){
                         type:"file",
                         fileID: res.fileID
                     })
-                    .then(function (res3) {   
-                        uploadProgressBar.value =  uploadProgressBar.max;
-                        alert("Upload Success!");//alert    
-                        location.reload(); 
+                    .then(function (res3) {
+                        value =  100;
+                        alert("Upload Success!");//alert
+                        location.reload();
                     });
                 }
                 else{
-                    uploadProgressBar.value =  uploadProgressBar.max; 
                     alert("The file has existed!")
+                    location.reload();
                     }
             });    
         });   
@@ -208,10 +209,22 @@ function upload(){
 //check cookie and the video list of this user when load the page(window)
 window.addEventListener("load",checkCookieVideoList,false);
 
-function test(){
-    if(uploadProgressBar.value<uploadProgressBar.max)
-        uploadProgressBar.value += 1
-    else
-         return ""   
-    setTimeout("test()", 20)
+function progress(value) {
+    if (value < 95) {
+        value += 1;
+        $("#uploadProgress").css("width", value + "%");
+
+        // if(uploadProgressBar.value<uploadProgressBar.max)
+        //     uploadProgressBar.value += 1
+
+        setTimeout("progress("+value+")", 30)
+    }else if (value>=95 && value<100){
+        value += 1;
+        $("#uploadProgress").css("width", value + "%");
+        setTimeout("progress("+value+")", 100)
+    }else if (value==100){
+        $("#uploadProgress").css("width", value + "%");
+        return "";
+    }else return"";
+
 }
