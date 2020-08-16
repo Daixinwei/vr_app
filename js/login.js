@@ -28,7 +28,7 @@ loginButton.addEventListener("click", login, false);
 function login(){
 	var uname = nameInput.value;
 	var pwd = md5(pwdInput.value);
-
+	
 	//avoid throw in Promise error when the 'uname' collection does not exist in tcb database
 	const tempuserlist = ["temp01","temp02","admin01","admin02"];      //edit when update user or admin collections in tcb database
 
@@ -54,7 +54,7 @@ function login(){
 							subwin = window.open("manage.html","_self");
 						else
 							subwin = window.open("vrsys.html","_self");
-						setCookie(subwin,"username",uname,7);    //set  ookie
+						setCookie(subwin,"username",uname,7);    //set  cookie
 					}
 				}
 			});
