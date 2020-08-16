@@ -2,8 +2,8 @@
     <html>
         <head>
             <meta http-equiv="Content-Type" charset="utf-8"/>
-            <title>InoueLab Daily Video Report</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+            <title>InoueLab Daily Video Report</title>
             <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
             <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -12,8 +12,9 @@
             <script src="https://code.jquery.com/jquery.js"></script>
             <script src="js/bootstrap.min.js"></script>
             <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+
             <script src="//imgcache.qq.com/qcloud/tcbjs/1.9.0/tcb.js"></script>
-            <style type="text/css">
+            <!--<style type="text/css">
                 .inputfile {
                     width: 0.1px;
                     height: 0.1px;
@@ -22,34 +23,36 @@
                     position: absolute;
                     z-index: -1;
                 }
-
-            </style>
+            </style>-->
         </head>
         <body>
             <div class="container">
-                <div class="jumbotron">
-                    <h2 align="center">Upload Your Video</h2>
-                </div>
-                <div align="center" style="margin: 50px auto">
-                    <div class="input-group input-group-lg">
-                        <input type="file" name="file" id="file" class="form-control" >
+                <div class = "container">
+                    
+                    <div class="jumbotron">
+                        <h2 style="text-align:center">Upload Your Video</h2>
                     </div>
-                    <div style="margin: 50px auto" align="center">
-                             <button type="submit" class="btn btn-success btn-lg" id="upload" style="text-shadow: black 2px 1px 1px" >Upload</button>
-                    </div>
-                    <div class="progress progress-striped active center-block" style="margin:50px auto; width: 600px">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" id="uploadProgress" aria-valuemax="100" style="width:0" >
-<!--                                <span id="remind" style="color:black;">0%</span>-->
+                    <div style="max-width: 400px; margin: 25px auto; padding:15px">
+                        <div class="input-group input-group-lg" style="margin-bottom: 20px">
+                            <input type="file" name="file" id="file" class="form-control" >
+                        </div>
+                         <button type="button" class="btn btn-success btn-block btn-lg" id="upload" style="text-shadow: black 2px 1px 1px" >Upload</button>
+                        <div class="progress progress-striped active center-block" style="margin:25px auto; width: 370px; display:none" id="progressDisplay">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" id="uploadProgress" aria-valuemax="100" style="width:0" >
+                            </div>
                         </div>
                     </div>
+
                 </div>
+
 
           <div class="container">
               <div class="jumbotron">
-                  <h2 align="center">Video List</h2>
+                  <h2 style="text-align:center">Video List</h2>
               </div>
-              <div id="fileBox">
-                  <!-- <div class="col-md-6">
+              <div class="container" id="fileBox">
+                <!-- instance of one file
+                    <div class="col-md-6">
                           <div class="thumbnail" style="padding: 20px">
                               <video width= "100%" controls="controls" >
                                    <source src="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/201926091_He Zhen.mp4" type="video/mp4">
@@ -62,7 +65,8 @@
                                   </button>
                               </p>
                            </div>
-                       </div>-->
+                       </div>
+                -->
 
                 </div>
               <span id="filenotice"></span>

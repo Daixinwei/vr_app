@@ -16,6 +16,7 @@ var uploadButton = document.getElementById("upload");
 var fileBoxList = document.getElementById("fileBox");
 var fileNoticeSpan = document.getElementById("filenotice");
 var uploadProgressBar = document.getElementById("uploadProgress");
+var progressDisplayDiv = document.getElementById("progressDisplay");
 fileInput.addEventListener("change", this.getFile.bind(this), false);
 uploadButton.addEventListener("click", this.upload.bind(this), false);
 
@@ -52,20 +53,22 @@ function checkCookieVideoList(){
         userCollection = db.collection(user);
         userCollection.where({type:"file", fileID:_.neq(null)})
         .get()
-        .then(function (res) {
+        .then(async function (res) {
             if(res.data.length == 0){
                 fileNoticeSpan.innerHTML="No file uploaded.";
             }
-            else{
-                
+            else{   //开始读取文件
+                var temprownode = null;
+
                 for(var i=0;i<res.data.length;i++){
                     var date = res.data[i].date; //*在这获取文件上传的日期
                     var comment = res.data[i].ct; //*在这获取文件的评论
                     var commentby = res.data[i].ctby; //*在这获取文件的评论者
-                    app.getTempFileURL({fileList:[res.data[i].fileID]})
+
+                    await app.getTempFileURL({fileList:[res.data[i].fileID]})
                     .then(res2=>{ 
                         //动态生成文件内容并压入
-
+                        console.log(i);
                         //获得文件下载链接 url
                         var fileObj = res2.fileList[0];
                         var url = fileObj.tempFileURL;
@@ -119,7 +122,19 @@ function checkCookieVideoList(){
                         odivnode.appendChild(idivnode);
 
                         //将一个文件内容压入 filebox
-                        fileBoxList.appendChild (odivnode);
+                      
+                        if (i%2 == 0) //如果为新的一行
+                        {
+                            var rownode = document.createElement("div");
+                            rownode.setAttribute("class","row");
+                            temprownode = rownode;
+                            temprownode.appendChild(odivnode);
+                            fileBoxList.appendChild (temprownode);
+                        }
+                        else{
+                            temprownode.appendChild(odivnode);                            
+                        }
+                        
                     });
                 }
             }
@@ -154,6 +169,7 @@ function getFile(e){
 //upload file
 function upload(){
     if(ename && efile){  
+        progressDisplayDiv.style.display = "block";
         var value=0;
         progress(value);
         app.uploadFile({
