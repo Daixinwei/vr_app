@@ -68,7 +68,7 @@ function checkCookieVideoList(){
                     await app.getTempFileURL({fileList:[res.data[i].fileID]})
                     .then(res2=>{ 
                         //动态生成文件内容并压入
-                        console.log(i);
+                
                         //获得文件下载链接 url
                         var fileObj = res2.fileList[0];
                         var url = fileObj.tempFileURL;
