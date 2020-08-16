@@ -18,18 +18,27 @@
         </head>
 
         <body>   
-          <div class="container"> 
-            
-            <div class="container col-md-10 ">
-              <h4>WORKERS' FILES</h4>
-              <table class="table table-hover" id="fileBox">
-                <!--
-                <tbody>
-                  <tr><td><a href="">...</a></td><td><button>..</button></td></tr>
-                  <tr><td><input class="form-control" type="text" placeholder="Give comment"/></td></tr>
-                </tbody>
-                -->
-              </table>
+          <div class="container">
+                <div class="jumbotron">
+                    <h2 style="text-align:center">Upload Your Video</h2>
+                </div>
+              <div class="col-md-6">
+                  <div class="thumbnail" style="padding: 10px">
+                      <video width= "100%" controls="controls" >
+                          <source src="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/201926091_He Zhen.mp4" type="video/mp4">
+                      </video>
+                      <h4>Date: 2020-08-13</h4>
+                      <div class="input-group input-group-sm">
+                          <span class="input-group-addon">Comment</span>
+                          <input type="text" class="form-control" placeholder="Please write down your comment here">
+                      </div>
+                      <p class="text-right" style="margin-top:8px">
+                          <button class="btn btn-primary">
+                              Delete
+                          </button>
+                      </p>
+                  </div>
+              </div>
               <span id="filenotice"></span>     
             </div>
 
