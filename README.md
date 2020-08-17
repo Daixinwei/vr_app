@@ -1,4 +1,5 @@
 # web-project
+  Project location: https://github.com/Daixinwei/vr_app/tree/dev
   用于收集用户视频，达成项目经理与成员间的沟通协作
 * 用户和管理员通过同一个登陆界面进入系统
 * 用户(user)
