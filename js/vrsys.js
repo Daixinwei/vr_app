@@ -133,8 +133,7 @@ function checkCookieVideoList(){
                         }
                         else{
                             temprownode.appendChild(odivnode);                            
-                        }
-                        
+                        }  
                     });
                 }
             }
@@ -198,7 +197,6 @@ function upload(){
                             location.reload();
                             },
                             1500);
-
                     });
                 }
                 else{

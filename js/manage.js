@@ -40,76 +40,96 @@ async function checkCookieAlluserVideoList(){
         const tempuserlist = ["temp01","temp02"];//users' ID. edit when update collections in tcb database
         //如果cookie中有记录用户名字则加载该用户的文件列表 
         for(var i=0; i<tempuserlist.length;i++){
+           
             var uname = tempuserlist[i];
             var ucollection = db.collection(uname);       
             await ucollection.where({type:"file", fileID:_.neq(null)})
             .get()
             .then(async function (res) {
                 if(res.data.length > 0){
-                    for(var j=0;j<res.data.length;j++){
+                    var temprownode = null;
+                    for(var j=0;j<res.data.length;j++){            
+                        var date = res.data[j].date; //*在这获取文件上传的日期
+                        var comment = res.data[j].ct; //*在这获取文件的评论
+                        var commentby = res.data[j].ctby; //*在这获取文件的评论者
                         await app.getTempFileURL({fileList:[res.data[j].fileID]})
                         .then(function(res2){
                             //动态生成html元素并压入：
                             //获得文件下载链接 url 和 文件名 fileName
-                            var fileObj = res2.fileList[0];
-                            
+                            var fileObj = res2.fileList[0];                            
                             var url = fileObj.tempFileURL;
                             var temparray = url.split('/');
                             var fileName = temparray.pop();//get the name from fileID
                             var un = temparray.pop();
                             
-                            //生成字面为fileName的文件链接
-                            var anode =document.createElement("a");
-                            var hrefnode=document.createAttribute("href");
-                            hrefnode.nodeValue=`${url}`;
-                           
-                            var textnode=document.createTextNode(`${un} / ${fileName}`);                          
-                            anode.attributes.setNamedItem(hrefnode);
-                            anode.appendChild(textnode);
-                            var tdanode =document.createElement("td");
-                            tdanode.appendChild(anode);
+                                //视频缩略图（<video><source></source></video>,只支持mp4类型的文件）
+                                var videonode= document.createElement("video");
+                                videonode.setAttribute("width", "100%");
+                                videonode.setAttribute("controls", "controls");
+
+                                var sourcenode = document.createElement("source");
+                                sourcenode.setAttribute("src", url);
+                                sourcenode.setAttribute("type", "video/mp4");
+                                videonode.appendChild(sourcenode);
+
+                                //生成Date和留言栏
+                                var hdatenode = document.createElement("h4");
+                                hdatenode.innerHTML = "Date: " + date;
+
+                                var divcommentnode = document.createElement("div");
+                                divcommentnode.setAttribute("class","input-group input-group-sm");
+                                var spancommentnode = document.createElement("span");
+                                spancommentnode.setAttribute("class","input-group-addon");
+                                spancommentnode.innerHTML = "Comment";
+                                var inputnode =  document.createElement("input");
+                                inputnode.setAttribute("type","text");
+                                inputnode.setAttribute("class","form-control");
+                                inputnode.addEventListener("change", function(){giveComment(fileObj.fileID, un,inputnode.value)}, false);
+                                divcommentnode.appendChild(spancommentnode);
+                                divcommentnode.appendChild(inputnode);
+                                if(comment)
+                                    inputnode.value = comment;
+                                else
+                                    inputnode.placeholder = "Please write down your comment here";
                             
-                            //生成对应文件的删除按钮
-                            var buttonnode = document.createElement("button");
-                            var textbuttonnode=document.createTextNode("Delete");  
-                            buttonnode.setAttribute("class","btn btn-success");     
-                            buttonnode.appendChild(textbuttonnode);
-                            buttonnode.addEventListener("click", function(){deleteFile(fileObj.fileID, un)}, false);
+                                //生成对应文件的删除按钮(<p><button></button><p>)
+                                var pbuttonnode = document.createElement("p");
+                                var buttonnode = document.createElement("button");
+                                var textbuttonnode=document.createTextNode("Delete");    
+                                buttonnode.appendChild(textbuttonnode);
+                                pbuttonnode.appendChild(buttonnode);
+                                buttonnode.setAttribute("class","btn btn-primary");  
+                                pbuttonnode.setAttribute("class","text-right");    
+                                pbuttonnode.style.marginTop = "8px";   
+                                buttonnode.addEventListener("click", function(){ deleteFile(fileObj.fileID, un)}, false);
 
-                            var tdeletenode =document.createElement("td");
-                            tdeletenode.appendChild(buttonnode);
+                            //生成外部div（idivnod & odivnode）
+                            var odivnode = document.createElement("div");
+                            var idivnode = document.createElement("div");
 
-                            //生成对应文件的留言栏
-                            var trcommentnode = document.createElement("tr");
-                            var tdcommentnode = document.createElement("td");
-                            var inputnode =  document.createElement("input");
-                            
-                            tdcommentnode.appendChild(inputnode);
-                            inputnode.setAttribute("type","text");
-                            inputnode.setAttribute("placeholder","Give Comment");
-                            inputnode.setAttribute("class","form-control");
-                            ucollection.where({type:"file", fileID:fileObj.fileID}).get()
-                            .then(res3=>{
-                               // console.log(res3.data);
-                                var tcoment;
-                                tcoment=res3.data[0].ct;
-                                if(tcoment)
-                                    inputnode.value=tcoment;         
-                            });
-                            inputnode.addEventListener("change", function(){giveComment(fileObj.fileID, un,inputnode.value)}, false);
+                            //将以上所有元素压入idivnode，idivnode压入odivnode
+                            idivnode.appendChild(videonode);
+                            idivnode.appendChild(hdatenode);
+                            idivnode.appendChild(divcommentnode);
+                            idivnode.appendChild(pbuttonnode);
+                            odivnode.setAttribute("class","col-md-6");
+                            idivnode.setAttribute("class","thumbnail");
+                            idivnode.setAttribute("style","padding: 10px");
+                            odivnode.appendChild(idivnode);
 
-                            //将所有元素压入表格的一行当中
-                            var trmainnode =document.createElement("tr");
-                            var tbodynode =document.createElement("tbody");
-                          
-                            trmainnode.appendChild(tdanode);
-                            trmainnode.appendChild(tdeletenode);
-                            trcommentnode.appendChild(tdcommentnode);
+                            //将一个文件内容压入 filebox
 
-                            tbodynode.appendChild(trmainnode);  
-                            tbodynode.appendChild(trcommentnode);    
-
-                            fileBoxList.appendChild (tbodynode);
+                            if (j%2 == 0) //如果为新的一行
+                            {
+                                var rownode = document.createElement("div");
+                                rownode.setAttribute("class","row");
+                                temprownode = rownode; 
+                                temprownode.appendChild(odivnode);
+                                fileBoxList.appendChild (temprownode);
+                            }
+                            else{
+                                temprownode.appendChild(odivnode);                            
+                            }  
                         });
                     }
                 }
