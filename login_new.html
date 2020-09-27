@@ -1,0 +1,92 @@
+﻿<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="https://inolab.slis.tsukuba.ac.jp/img/favicon.ico">
+	<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="css/style.css"> <!-- Gem style -->
+	<script src="js/modernizr.js"></script> <!-- Modernizr -->  
+	<script src="https://imgcache.qq.com/qcloud/tcbjs/1.6.1/tcb.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="https://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.min.js"></script>
+  	
+	<title>Interaction Lab Video Report System</title>
+</head>
+<body>
+	<header role="banner">
+		<div id="cd-logo"><a href="#0"><img src="img/cd-logo.svg" alt="Logo"></a></div>
+		<div id="cd-heading">
+			<span class="heading">Interaction Lab Video Report System 200927</span>
+		</div>
+		<nav class="main-nav">
+			<ul>
+				<!-- inser more links here -->
+				<li><a class="cd-signin" href="#0">Sign in</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<div class="cd-user-modal"> <!-- this is the entire modal form, including the background -->
+		<div class="cd-user-modal-container"> <!-- this is the container wrapper -->
+			<ul class="cd-switcher">
+				<li><a href="#0">EMPLOYEE</a></li>
+				<li><a href="#0">MANAGER</a></li>
+			</ul>
+
+			<div id="cd-login"> <!-- user log in form -->
+				<form class="cd-form">
+					<p class="fieldset">
+						<label class="image-replace cd-username" for="signin-email">User ID</label>
+						<input class="full-width has-padding has-border" id="signin-email" type="text" placeholder="User ID">
+						<span class="cd-error-message">Error message here!</span>
+					</p>
+
+					<p class="fieldset">
+						<label class="image-replace cd-password" for="signin-password">Password</label>
+						<input class="full-width has-padding has-border" id="signin-password" type="text"  placeholder="Password">
+						<a href="#0" class="hide-password">Hide</a>
+						<span class="cd-error-message">Error message here!</span>
+					</p>
+
+					<p class="fieldset">
+						<input class="full-width" type="submit" value="Login" id="signIn">
+					</p>
+				</form>
+				
+			</div> <!-- cd-e-signin -->
+
+			<div id="cd-signup"> <!-- manager login in form -->
+				<form class="cd-form">
+
+					<p class="fieldset">
+						<label class="image-replace cd-username" for="signup-email">User ID</label>
+						<input class="full-width has-padding has-border" id="signup-email" type="text" placeholder="User ID">
+						<span class="cd-error-message">Error message here!</span>
+					</p>
+
+					<p class="fieldset">
+						<label class="image-replace cd-password" for="signup-password">Password</label>
+						<input class="full-width has-padding has-border" id="signup-password" type="text"  placeholder="Password">
+						<a href="#0" class="hide-password">Hide</a>
+						<span class="cd-error-message">Error message here!</span>
+					</p>
+
+
+					<p class="fieldset">
+						<input class="full-width has-padding" type="submit" value="Login" id="signUp">
+					</p>
+				</form>
+			</div> <!-- cd-m-login in -->
+
+			<div id="cd-reset-password"> <!-- reset password form -->
+				<p class="cd-form-message">Lost your password? Please enter your email address. You will receive a link to create a new password.</p
+					>
+			<a href="#0" class="cd-close-form">Close</a>
+		</div> <!-- cd-user-modal-container -->
+	</div> <!-- cd-user-modal -->
+<script src="js/jquery.1.11.1.js"></script>
+<script src="js/login_new_tcb.js"></script>
+<script src="js/login_new_main.js"></script> <!-- Gem jQuery -->
+</body>
+</html>
