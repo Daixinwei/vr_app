@@ -9,7 +9,8 @@
             <link rel='stylesheet' href='css/aqua.min.css'>
             <link rel='stylesheet' href='css/style_nav.css'>
             <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css'>
-            <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" >
+            <link rel='stylesheet' href="css/bootstrap-datetimepicker.min.css">
             <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -17,6 +18,8 @@
             <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.0/moment-with-locales.min.js" type="text/javascript"></script>      
+            <script src="js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
         
             <script src="https://imgcache.qq.com/qcloud/tcbjs/1.6.1/tcb.js"></script>
             <style type ="text/css">
@@ -31,131 +34,177 @@
         </head>
         <body>
 
-        <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-            <a class="navbar-brand" href="vrsys.html">InoueLab Video Report</a>           
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Upload</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">New Comment</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">History</a>
-                    </li>
-                </ul>
-                <span class = "navbar-text px-1" >Hello! username</span>
-                <form class="form-inline my-2 my-lg-0">
-                    <a href="login_new.html"><button class="btn btn-outline-success my-2 my-sm-0" type ="button">Log out</button></a> 
-                </form>
-            </div>
-        </nav> -->
-
         <div class = "container-fluid">
-        <div class="row">  
-            <div class="col">
-            <!-- Banner -->
-            <header role="banner">
-                <div id="cd-logo"><a href="#0"><img src="img/cd-logo.svg" alt="Logo"></a></div>
-                <div id="cd-heading">
-                    <span class="heading">Interaction Lab Video Report System 200927</span>
-                </div>
-                <nav class="main-nav">
-                    <ul>
-                        <!-- inser more links here -->
-                        <li><p id = "helloUserName" style ="color:#FFF" >Hello!</p></li>
-                        <li><a class="cd-signin" href="login_new.html">Log out</a></li>
-                    </ul>
-                </nav>
-            </header> 
-        </div> 
-        </div>
-        <div class="row">
-            <!-- Navbar -->    
-            <div class="col-lg-2">
-                <div class="light-mode overflow-hidden">
-                    <div>
-                        <ul class="menu mt-1">
-                            <li class="menu-item active"><i class="icon fas fa-check-square mr-3"></i>Upload</li>
-                            <li class="divider"></li>
-                            <li class="menu-item"><i class="icon fas fa-bell mr-3"></i>New Comment</li>
-                            <li class="divider"></li>
-                            <li class="menu-item"><i class="icon fas fa-image mr-3"></i>History</li>
-                            <li class="divider"></li>
-                        </ul>
-                    </div>
-                </div>
+            <div class="row">  
+                <div class="col">
+                <!-- Banner -->
+                    <header role="banner">
+                        <div id="cd-logo"><a href="#0"><img src="img/cd-logo.svg" alt="Logo"></a></div>
+                        <div id="cd-heading">
+                            <span class="heading">Interaction Lab Video Report System 200929</span>
+                        </div>
+                        <nav class="main-nav">
+                            <ul>
+                                <!-- inser more links here -->
+                                <li><p id = "helloUserName" style ="color:#FFF" >Hello!</p></li>
+                                <li><a class="cd-signin" href="login_new.html">Log out</a></li>
+                            </ul>
+                        </nav>
+                    </header> 
+                </div> 
             </div>
-            <!-- Main content -->
-            <div class="col-lg-10">
-                <div id="cd-upload" class = "container-fluid" >
-                    <div style="max-width:500px; margin: 10px auto; padding:15px">
-                        <p class="h4 text-center">Upload Your Video Here</p>
-                        <div class ="dashboard border border-dark rounded" id = "dashboard">
-                            <div style = "height:100%" class ="row align-items-center justify-content-center login-center">
-                                <p id = "fileName">Drag video here or</br>click here to add video</p>
-                                
-                                <input type="file" id="file" style="display:none">
-                            </div>
-                        </div>
-
-                        <div class="input-group" style="margin-bottom: 20px">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Note</span>
-                            </div>
-                            <textarea class="form-control" aria-label="Note" id = "Note"></textarea>
-                        </div>
-                    
-                        <button type="button" class="btn btn-success btn-block btn-lg" id="upload" style="text-shadow: black 2px 1px 1px" >Upload</button>
-                        <div class="progress invisible" style="margin:25px auto" id="progressDisplay">
-                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0"  aria-valuemax="100" style="width:0%" id="uploadProgress"></div>
+            <div class="row">
+                <!-- Navbar -->    
+                <div class="col-lg-2">
+                    <div class="light-mode overflow-hidden">
+                        <div>
+                            <ul class="menu mt-1">
+                                <li class="menu-item active"><i class="icon fas fa-check-square mr-3"></i>Upload</li>
+                                <li class="divider"></li>
+                                <li class="menu-item"><i class="icon fas fa-bell mr-3"></i>New Comment</li>
+                                <li class="divider"></li>
+                                <li class="menu-item"><i class="icon fas fa-image mr-3"></i>History</li>
+                                <li class="divider"></li>
+                            </ul>
                         </div>
                     </div>
-
                 </div>
+                <!-- Main content -->
+                <div class="col-lg-10">
+                    <!-- Upload -->
+                    <div id="cd-upload" class = "container-fluid" >
+                        <div style="max-width:500px; margin: 10px auto; padding:15px">
 
-                <div id = "cd-newcomment" class ="container">  
-                    <div class="my-2">
-                        <h4 style="text-align:center">New Comment</h4>
-                    </div>
-                    <div class="container" id="nc-fileBox">
-
-                    </div>   
-                    <span id="nc-filenotice"></span>    
-                </div>
-
-                <div id= "cd-history" class="container">
-                    <div class="my-2">
-                        <h4 style="text-align:center">History of Uploaded video</h4>
-                    </div>
-                    <div class="container" id="fileBox">
-                        <div class="row">
-                            
-                            <!--<div class="col-md-4 py-2">
-                                <div class="border rounded-sm" style="padding: 15px">
-                                    <i class ="icon fas fa-times float-right mb-1" style = "cursor:pointer"></i>
-                                    <video width= "100%" height="200px" controls="controls">
-                                        <source src="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/2020-06-05 at 10-07-37.mp4" type="video/mp4">
-                                    </video>
-                                    <p> 2020-08-13</p>
-                                        <span class = "float-right"></span>
-
-                                    <p style = "color:gray"><strong>Note:</strong></p>
-                                    <p><strong>Comment:</strong> Nice </p>
+                            <p class="h4 text-center">Upload Your Video Here</p>
+                            <div class ="dashboard border border-dark rounded" id = "dashboard">
+                                <div style = "height:100%" class ="row align-items-center justify-content-center login-center">
+                                    <p id = "fileName">Drag video here or</br>click here to add video</p>
+                                    
+                                    <input type="file" id="file" style="display:none">
                                 </div>
-                            </div>-->
-                            
+                            </div>
+
+                            <div class="input-group" style="margin-bottom: 20px">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Note</span>
+                                </div>
+                                <textarea class="form-control" aria-label="Note" id = "Note"></textarea>
+                            </div>
+                        
+                            <button type="button" class="btn btn-secondary btn-block btn-lg" id="upload" style="text-shadow: black 2px 1px 1px" >Upload</button>
+                            <div class="progress invisible" style="margin:25px auto" id="progressDisplay">
+                                <div class="progress-bar progress-bar-striped bg-secondary" role="progressbar" aria-valuenow="0" aria-valuemin="0"  aria-valuemax="100" style="width:0%" id="uploadProgress"></div>
+                            </div>
+                        
+                            <!-- upload toast -->
+                            <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center">
+                                <div class="toast align-middle" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+                                    <div class="toast-header">
+                                        <img src="img/cd-logo.svg" class="rounded mr-2" alt="">
+                                        <strong class="mr-auto">Reminder</strong>
+                                        <small class="text-muted"></small>
+                                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="toast-body" id="toast-body">
+                                        Upload Success
+                                    </div> 
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                    <span id="filenotice"></span>
+
+                    <!-- New comment -->
+                    <div id = "cd-newcomment" class ="container">  
+                        <div class = "container mb-3">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#">Videos</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="container" id="nc-fileBox">
+                        </div>   
+                        <span id="nc-filenotice"></span>  
+                    </div>
+
+                    <!-- History -->
+                    <div id= "cd-history" class="container">
+                        <!--input date-->
+                        <div class="container">
+                            <div id="datetimepicker" class="input-group date" style="max-width:250px" data-target-input="nearest">
+                                <input id= "date-search" class="form-control" type="text" name="" placeholder="Search by Date" aria-label="Date" aria-describedby="my-addon" data-target="#datetimepicker">
+                                <div class="input-group-prepend" data-target="#datetimepicker" data-toggle="datetimepicker">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="container" id="fileBox">
+                            <!-- <div class="row">
+                                
+                                <div class="col-md-4 py-2">
+                                    <div class="border rounded-sm" style="padding: 15px">
+                                        <i class ="icon fas fa-times float-right mb-1" style = "cursor:pointer"></i>
+                                        <video width= "100%" height="200px" controls="controls">
+                                            <source src="https://6478-dxwvr-1e2175-1258526572.tcb.qcloud.la/temp01/20200304_He.mp4" type="video/mp4">
+                                        </video>
+                                        <p> 2020-08-13</p>
+                                            <span class = "badge badge-secondary float-right"></span>
+
+                                        <p style = "color:gray"><strong>Note:</strong></p>
+                                        <p><strong>Comment:</strong> Nice </p>
+                                        <button type="button" class="btn btn-success btn-block btn-lg" style="text-shadow: black 2px 1px 1px" >Confirm</button>
+                                    </div>
+                                </div>
+                                
+                            </div> -->
+                        </div>
+                        <span id="filenotice"></span>
+                        <!-- delete toast -->
+                        <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center">
+                            <div class="toast align-middle" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+                                <div class="toast-header">
+                                    <img src="img/cd-logo.svg" class="rounded mr-2" alt="">
+                                    <strong class="mr-auto">Reminder</strong>
+                                    <small class="text-muted"></small>
+                                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="toast-body">
+                                    Delete Success
+                                </div> 
+                            </div>
+                        </div>                       
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal" id ="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModelLabel">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><strong>Confirm</strong></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Have you confirmed this comment?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="confirm-button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
-
-        </div>
         </div>
         </body>
         <script src="js/vrsys.js"></script>

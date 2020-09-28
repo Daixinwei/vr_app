@@ -87,23 +87,21 @@ function checkCookieVideoList(){
     }
     else{//该用户未登录
         alert("Please login!");
-        window.open("login.html","_self");
+        window.open("login_new.html","_self");
     }
 }
 
 function deleteFile(tempfileID){
     //删除文件
-
     app.deleteFile({fileList:[tempfileID]})
     .then(res=>{        
-            alert("Delete success!");
              //从该用户的集合删除形容该文件的文档
             userCollection.where({type:"file", fileID:tempfileID}).remove().then(res=>{
-            //location.reload(); 
+            $(".toast").eq(1).toast("show")
             $("#fileBox").empty();
+            $("#nc-fileBox").empty();
             refreshVideoList(user,false,fileBoxList,fileNoticeSpan);
             refreshVideoList(user,true,nc_fileBoxList,nc_fileNoticeSpan);
-
         });
     });  
 }
@@ -123,14 +121,13 @@ function upload(){
         progressDisplayDiv.className = "progress visible";
         var value = 0;
         progress(value);
+        var index= ename.lastIndexOf(".");
+        var ext = ename.substr(index+1);
         app.uploadFile({
             //文件的绝对路径，包含文件名
             cloudPath: user+"/"+ename,
             //要上传的文件对象
             filePath: efile
-            // onUploadProgress: function (progressEvent) {
-            //     // console.log(progressEvent);
-            //     // var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         }).then(res=>{
             //写入对应用户的json文档里
             const _=db.command;
@@ -140,6 +137,7 @@ function upload(){
                     //edit the structure of data file
                     userCollection.add({ 
                         type:"file",
+                        format:ext,
                         fileID: res.fileID,
                         date: getUploadDate(),
                         note: noteInput.value,
@@ -149,23 +147,34 @@ function upload(){
                     .then(function (res3) {
                         $("#uploadProgress").css("width", "100%");
                         setTimeout(function(){
-                            alert("Upload Success!");
-                            location.reload();
+                            $("#uploadProgress").css("width", "0%");
+                            progressDisplayDiv.className = "progress invisible"
+                            $("#toast-body").text("Upload Success")
+                            $(".toast").eq(0).toast("show")
+                            fileNoticeSpan.innerHTML=""
+                            $("#fileBox").empty()
+                            refreshVideoList(user,false,fileBoxList,fileNoticeSpan)
                             },
                             1500);
                     });
                 }
                 else{
-                    alert("The file has existed!")
-                    location.reload();
+                    //alert("The file has existed!")
+                    //location.reload();  
+                    progressDisplayDiv.className = "progress invisible"
+                    $("#toast-body").text("The file has existed")
+                    $(".toast").eq(0).toast("show")    
                     }
             });    
         });   
     }
     else
-        window.alert("Upload Failed");
+    {
+        progressDisplayDiv.className = "progress invisible"
+        $("#toast-body").text("Upload Failed")
+        $(".toast").eq(0).toast("show")
+    }
 }
-
 
 
 function progress(value) {
@@ -222,7 +231,7 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
 
                 var isComment = res.data[i].isComment;
                 if(isNewComment && !isComment){
-                    if(num == -1 && i == res.data.length-1) fileNoticeSpan.innerHTML = "No new comment."
+                    if(num == -1 && i == res.data.length-1) fileNoticeSpan.innerHTML = "No new comment"
                     continue
                 }
                 else
@@ -233,6 +242,7 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
                 var comment = res.data[i].ct; //*在这获取文件的评论
                 var note = res.data[i].note;
                 var commentby = res.data[i].ctby; //*在这获取文件的评论者
+                var format = res.data[i].format;
 
                 await app.getTempFileURL({fileList:[res.data[i].fileID]})
                 .then(res2=>{ 
@@ -242,6 +252,7 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
                     var fileObj = res2.fileList[0];
                     var url = fileObj.tempFileURL;
 
+                        //X图标，删除
                         var inode = document.createElement("i");
                         inode.className = "icon fas fa-times float-right mb-1";
                         inode.style.cursor = "pointer";
@@ -250,6 +261,26 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
                             e.preventDefault(); 
                             deleteFile(fileObj.fileID)}, 
                             false);
+
+                        //confirm 按钮(on in new comment page)
+                        var buttonnode = document.createElement("button")
+                        buttonnode.innerText = "Confirm"  
+                        buttonnode.type = "button"
+                        buttonnode.className = "btn btn-success btn-block btn-lg"
+                        buttonnode.style.textShadow = "black 2px 1px 1px"
+                        buttonnode.setAttribute("data-toggle","modal")
+                        buttonnode.setAttribute("data-target","#confirmModal")
+                        buttonnode.addEventListener("click", function(e){ 
+                            e.preventDefault();
+                            $('#confirm-button').click(async function (e) { 
+                                e.preventDefault();
+                                await userCollection.where({type:"file", fileID:fileObj.fileID}).update({isComment:false});
+                                $('#nc-fileBox').empty(); 
+                                refreshVideoList(user,true,nc_fileBoxList,nc_fileNoticeSpan);
+                            });
+                            }, 
+                            false);                   
+
                         //视频缩略图（<video><source></source></video>,只支持mp4类型的文件）
                         var videonode= document.createElement("video");
                         videonode.setAttribute("width", "100%");
@@ -261,11 +292,13 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
                         sourcenode.setAttribute("type", "video/mp4");
                         videonode.appendChild(sourcenode);
 
-
-                
                         //生成Date和Comment
                         var hdatenode = document.createElement("p");
-                        hdatenode.innerHTML = date;
+                        hdatenode.innerText = date;
+                        var spanbadge = document.createElement("span")
+                        spanbadge.className = "badge badge-secondary float-right"
+                        spanbadge.innerText = format;
+                        hdatenode.appendChild(spanbadge)
 
                         //Note
                         var pnotenode = document.createElement("p")
@@ -282,26 +315,19 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
                         else
                             pcommentnode.innerHTML = "No Comment";
 
-                        //生成对应文件的删除按钮(<p><button></button><p>)
-                        //var pbuttonnode = document.createElement("p");
-                        //var buttonnode = document.createElement("button");
-                        //var textbuttonnode=document.createTextNode("Delete");    
-                        //buttonnode.appendChild(textbuttonnode);
-                        //pbuttonnode.appendChild(buttonnode);
-                        //buttonnode.setAttribute("class","btn btn-primary");  
-                        //pbuttonnode.setAttribute("class","text-right");     
-
-
                         //生成外部div（idivnod & odivnode）
                         var odivnode = document.createElement("div");
                         var idivnode = document.createElement("div");
 
                     //将以上所有元素压入idivnode，idivnode压入odivnode
-                    idivnode.appendChild(inode);
+                    if(isNewComment == false)
+                        idivnode.appendChild(inode);
                     idivnode.appendChild(videonode);
                     idivnode.appendChild(hdatenode);
                     idivnode.appendChild(pnotenode);
                     idivnode.appendChild(pcommentnode);
+                    if(isNewComment == true)
+                        idivnode.appendChild(buttonnode);
                    // idivnode.appendChild(pbuttonnode);
                     odivnode.setAttribute("class","col-md-4 py-2");
                     idivnode.setAttribute("class","border rounded-sm");
@@ -327,9 +353,148 @@ function refreshVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan){
 
 }
 
+function searchVideoList(tuser, isNewComment, fileBoxList, fileNoticeSpan, tdate){
+    var num = -1;
+    const _ = db.command;   
+    userCollection = db.collection(tuser);
+    userCollection.where({type:"file", date:_.eq(tdate)})
+    .get()
+    .then(async function (res) {
+        if(res.data.length == 0){
+            fileNoticeSpan.innerHTML="No result";
+        }
+        else{   //开始读取文件
+            var temprownode = null;
+
+            for(var i=0;i<res.data.length;i++){
+
+                var isComment = res.data[i].isComment;
+                if(isNewComment && !isComment){
+                    if(num == -1 && i == res.data.length-1) fileNoticeSpan.innerHTML = "No new comment"
+                    continue
+                }
+                else
+                {
+                    num ++
+                }
+                var date = res.data[i].date; //*在这获取文件上传的日期
+                var comment = res.data[i].ct; //*在这获取文件的评论
+                var note = res.data[i].note;
+                var commentby = res.data[i].ctby; //*在这获取文件的评论者
+                var format = res.data[i].format;
+
+                await app.getTempFileURL({fileList:[res.data[i].fileID]})
+                .then(res2=>{ 
+                    //动态生成文件内容并压入
+            
+                    //获得文件下载链接 url
+                    var fileObj = res2.fileList[0];
+                    var url = fileObj.tempFileURL;
+
+                        //X图标，删除
+                        var inode = document.createElement("i");
+                        inode.className = "icon fas fa-times float-right mb-1";
+                        inode.style.cursor = "pointer";
+                        inode.addEventListener("click", function(e){ 
+                            e.stopPropagation();
+                            e.preventDefault(); 
+                            deleteFile(fileObj.fileID)}, 
+                            false);
+
+                        //confirm 按钮(on in new comment page)
+                        var buttonnode = document.createElement("button")
+                        buttonnode.innerText = "Confirm"  
+                        buttonnode.type = "button"
+                        buttonnode.className = "btn btn-success btn-block btn-lg"
+                        buttonnode.style.textShadow = "black 2px 1px 1px"
+                        buttonnode.setAttribute("data-toggle","modal")
+                        buttonnode.setAttribute("data-target","#confirmModal")
+                        buttonnode.addEventListener("click", function(e){ 
+                            e.preventDefault();
+                            $('#confirm-button').click(async function (e) { 
+                                e.preventDefault();
+                                await userCollection.where({type:"file", fileID:fileObj.fileID}).update({isComment:false});
+                                $('#nc-fileBox').empty(); 
+                                refreshVideoList(user,true,nc_fileBoxList,nc_fileNoticeSpan);
+                            });
+                            }, 
+                            false);                   
+
+                        //视频缩略图（<video><source></source></video>,只支持mp4类型的文件）
+                        var videonode= document.createElement("video");
+                        videonode.setAttribute("width", "100%");
+                        videonode.setAttribute("height", "200px");
+                        videonode.setAttribute("controls", "controls");
+
+                        var sourcenode = document.createElement("source");
+                        sourcenode.setAttribute("src", url);
+                        sourcenode.setAttribute("type", "video/mp4");
+                        videonode.appendChild(sourcenode);
+
+                        //生成Date和Comment
+                        var hdatenode = document.createElement("p");
+                        hdatenode.innerText = date;
+                        var spanbadge = document.createElement("span")
+                        spanbadge.className = "badge badge-secondary float-right"
+                        spanbadge.innerText = format;
+                        hdatenode.appendChild(spanbadge)
+
+                        //Note
+                        var pnotenode = document.createElement("p")
+                        pnotenode.style.color = "gray"
+                        pnotenode.innerHTML = "Note: " + note;
+
+                        var pcommentnode = document.createElement("p");
+                        var strongnode = document.createElement("strong");
+                        strongnode.innerHTML = "Comment: ";
+                        var textcommentnode=document.createTextNode(comment);
+                        pcommentnode.appendChild(strongnode);
+                        if(comment)
+                            pcommentnode.appendChild(textcommentnode);
+                        else
+                            pcommentnode.innerHTML = "No Comment";
+
+                        //生成外部div（idivnod & odivnode）
+                        var odivnode = document.createElement("div");
+                        var idivnode = document.createElement("div");
+
+                    //将以上所有元素压入idivnode，idivnode压入odivnode
+                    if(isNewComment == false)
+                        idivnode.appendChild(inode);
+                    idivnode.appendChild(videonode);
+                    idivnode.appendChild(hdatenode);
+                    idivnode.appendChild(pnotenode);
+                    idivnode.appendChild(pcommentnode);
+                    if(isNewComment == true)
+                        idivnode.appendChild(buttonnode);
+                   // idivnode.appendChild(pbuttonnode);
+                    odivnode.setAttribute("class","col-md-4 py-2");
+                    idivnode.setAttribute("class","border rounded-sm");
+                    idivnode.setAttribute("style","padding: 15px");
+                    odivnode.appendChild(idivnode);
+
+                    //将一个文件内容压入 filebox
+                    if (num% 3 == 0) //如果为新的一行
+                    {
+                        var rownode = document.createElement("div");
+                        rownode.setAttribute("class","row");
+                        temprownode = rownode;
+                        temprownode.appendChild(odivnode);
+                        fileBoxList.appendChild (temprownode);
+                    }
+                    else{
+                        temprownode.appendChild(odivnode);                            
+                    }  
+                });
+            }
+        }
+    });
+
+}
 //Jquery.new code (Date: 200927)
 $(document).ready(function($){
-var $page_upload = $("#cd-upload"),
+var $h_filebox = $("#fileBox"),
+    $page_upload = $("#cd-upload"),
     $page_newcomment = $("#cd-newcomment"),
     $page_history = $("#cd-history"),
     $tab_whole = $(".menu"),
@@ -340,7 +505,6 @@ var $page_upload = $("#cd-upload"),
     $page_upload.show()
     $page_newcomment.hide()
     $page_history.hide()
-
     //switch page from nav
     $tab_whole.on('click', function (event) {
         event.preventDefault()
@@ -371,7 +535,29 @@ var $page_upload = $("#cd-upload"),
             $tab_newcomment.removeClass("active")
             $tab_history.addClass("active")
         }
-    });
+    })
+
+    //select date from calendar
+    $("#datetimepicker").datetimepicker({
+        format:'YYYY-MM-DD',
+        locale:'ja'
+    })
+
+    //search by date
+    $("#date-search").on('blur',function(event){ 
+        event.preventDefault()
+        $h_filebox.empty()
+        fileNoticeSpan.innerHTML = null
+        console.log(this.value)
+        if(this.value.length==0)
+        {
+            refreshVideoList(user,false,fileBoxList,fileNoticeSpan)
+        }
+        else
+        {
+            searchVideoList(user,false,fileBoxList,fileNoticeSpan,this.value)
+        }
+    })
 })
 
 
