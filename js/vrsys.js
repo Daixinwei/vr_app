@@ -118,6 +118,7 @@ function getFile(e){
 //upload file
 function upload(){
     if(ename && efile){  
+        uploadProgressBar.style.width = 0;
         progressDisplayDiv.className = "progress visible";
         var value = 0;
         progress(value);
@@ -147,7 +148,6 @@ function upload(){
                     .then(function (res3) {
                         $("#uploadProgress").css("width", "100%");
                         setTimeout(function(){
-                            $("#uploadProgress").css("width", "0%");
                             progressDisplayDiv.className = "progress invisible"
                             $("#toast-body").text("Upload Success")
                             $(".toast").eq(0).toast("show")

@@ -4,6 +4,19 @@ Used in login_new.html
 
 var envId ="dxwvr-1e2175";
 
+//avoid throw in Promise error when the 'uname' collection does not exist in tcb database
+	//edit when update user or admin collections in tcb database
+var e_tempuserlist = ["temp01","temp02"]; 
+var m_tempuserlist = ["admin01","admin02"]; 
+var e_nameInput = document.getElementById("signin-email");
+var e_pwdInput = document.getElementById("signin-password");
+var e_loginButton = document.getElementById("signIn");
+var m_nameInput = document.getElementById("signup-email");
+var m_pwdInput = document.getElementById("signup-password");
+var m_loginButton = document.getElementById("signUp");
+e_loginButton.addEventListener("click", function(){login(e_nameInput, e_pwdInput, e_tempuserlist)}, false);
+m_loginButton.addEventListener("click", function(){login(m_nameInput, m_pwdInput, m_tempuserlist)}, false);
+
 //init CloudBase
 const app =tcb.init({
 	env:envId
@@ -18,20 +31,6 @@ if(!auth.hasLoginState()) {
 }
 
 const db = app.database();
-
-//avoid throw in Promise error when the 'uname' collection does not exist in tcb database
-	//edit when update user or admin collections in tcb database
-var e_tempuserlist = ["temp01","temp02"]; 
-var m_tempuserlist = ["admin01","admin02"]; 
-var e_nameInput = document.getElementById("signin-email");
-var e_pwdInput = document.getElementById("signin-password");
-var e_loginButton = document.getElementById("signIn");
-var m_nameInput = document.getElementById("signup-email");
-var m_pwdInput = document.getElementById("signup-password");
-var m_loginButton = document.getElementById("signUp");
-e_loginButton.addEventListener("click", function(){login(e_nameInput, e_pwdInput, e_tempuserlist)}, false);
-m_loginButton.addEventListener("click", function(){login(m_nameInput, m_pwdInput, m_tempuserlist)}, false);
-
 
 //bind to login button
 function login(nameInput, pwdInput, tempuserlist){

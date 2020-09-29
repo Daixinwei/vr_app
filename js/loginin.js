@@ -6,7 +6,7 @@ var envId ="dxwvr-1e2175";
 
 //init CloudBase
 const app =tcb.init({
-  env:envId
+    env:envId
 });
 
 var auth = app.auth({
