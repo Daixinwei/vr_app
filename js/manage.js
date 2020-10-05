@@ -1,33 +1,36 @@
-/*-----------------
-Used in manage.html
--------------------*/
-var envId ="dxwvr-1e2175" ;
-var user = null;
+/**
+ * attached to manage.html
+ */
+var envId ="dxwvr-1e2175"
+var user = null
 
-var h_fileBoxList = document.getElementById("h-fileBox");
-var h_fileNoticeSpan = document.getElementById("h-filenotice");
-var nv_fileBoxList = document.getElementById("nv-fileBox");
-var nv_fileNoticeSpan = document.getElementById("nv-filenotice");
-var comment_input = document.getElementById("comment-input");
-const tempmanagerlist = ["admin01","admin02"];
-const tempuserlist = ["temp01","temp02"];//users' ID. edit when update collections in tcb database
-//check cookie and the video list of this user when load the page(window)
-window.addEventListener("load",checkCookieAlluserVideoList,false);
+var h_fileBoxList = document.getElementById("h-fileBox")
+var h_fileNoticeSpan = document.getElementById("h-filenotice")
+var nv_fileBoxList = document.getElementById("nv-fileBox")
+var nv_fileNoticeSpan = document.getElementById("nv-filenotice")
+var comment_input = document.getElementById("comment-input")
+const tempmanagerlist = ["admin01","admin02"]//managers' ID. edit when update collections in tcb database
+const tempuserlist = ["temp01","temp02"]//users' ID. edit when update collections in tcb database
+window.addEventListener("load",checkCookieAlluserVideoList,false)
 
 const app =tcb.init({
     env:envId
-});
+})
 
 var auth = app.auth({
     persistence: "local"
-});
+})
 
 if(!auth.hasLoginState()) {
-	auth.signInAnonymously();
+	auth.signInAnonymously()
 }
 
-const db =app.database();
+const db =app.database()
 
+/**
+ * get the key value by index name
+ * @param {*} cname index name for searching in cookie
+ */
 function getCookie(cname){
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -38,7 +41,9 @@ function getCookie(cname){
     return "";
 }
 
-//*****check chookie and video list of user when onload vrsys.html
+/**
+ * check chookie and video list of user when loading document
+ */
 function checkCookieAlluserVideoList(){
     user = getCookie("username");
     helloUserName.innerHTML = "Hello! " + user;
@@ -50,12 +55,21 @@ function checkCookieAlluserVideoList(){
     else{//该用户未登录
         alert("Please login!");
         window.open("login.html","_self");
+        //window.open("login.html","_self");
     }
 }
 
+/**
+ *
+ * reread data base and then refresh the file box 
+ * @param {*} fileBoxList div element for file box 
+ * @param {*} fileNoticeSpan span element for file notice 
+ * @param {*} isNewVideo is the fixbox in "New Video" page
+ */
 async function refreshFileBox(fileBoxList, fileNoticeSpan, isNewVideo){
     var num = -1;
     const _ = db.command;
+    var temprownode = null;
     for(var i=0; i<tempuserlist.length;i++)
     {
         var uname = tempuserlist[i]
@@ -65,12 +79,20 @@ async function refreshFileBox(fileBoxList, fileNoticeSpan, isNewVideo){
         .then(function (res) 
         {
             if(res.data.length > 0)
-            {
-                var temprownode = null;
+            {       
                 for(var j=0;j<res.data.length;j++)
                 {   
-                    var isCheck = res.data[j].isCheck;
-                    if(isNewVideo && isCheck){
+                    var isCheckbyU = false;
+                    var comment = res.data[j].ct;
+                    if(comment instanceof Array)
+                    {
+                        comment.forEach(function(commentObj)
+                        {
+                            if(commentObj.by == user)
+                                isCheckbyU = true;
+                        })
+                    }
+                    if(isNewVideo && isCheckbyU){
                         continue
                     }
                     else
@@ -106,9 +128,17 @@ async function refreshFileBox(fileBoxList, fileNoticeSpan, isNewVideo){
     }
 }
 
+/**
+ *
+ * used in "history" page 
+ * @param {*} fileBoxList div element for file box (id="h-filebox")
+ * @param {*} fileNoticeSpan span elemnt for file notice (id = "h-fileNoticeSpan")
+ * @param {*} date  the value U input in the input box
+ */
 async function searchByDate(fileBoxList, fileNoticeSpan, date){
     var num = -1;
     const _ = db.command;
+    var temprownode = null;
     for(var i=0; i<tempuserlist.length;i++)
     {
         var uname = tempuserlist[i]
@@ -118,15 +148,13 @@ async function searchByDate(fileBoxList, fileNoticeSpan, date){
         .then(function (res) 
         {
             if(res.data.length > 0)
-            {
-                var temprownode = null;
+            { 
                 for(var j=0;j<res.data.length;j++)
                 {   
-                    var isCheck = res.data[j].isCheck;
-                        num ++
+                    num ++
                     //生成一个卡片      
                     var cardnode = document.createElement("div");
-                    writeCard(res.data[j], cardnode)                     
+                    writeCard(res.data[j], cardnode, false)                     
                     if (num % 3 == 0) //如果为新的一行
                     {
                         var rownode = document.createElement("div");
@@ -149,13 +177,19 @@ async function searchByDate(fileBoxList, fileNoticeSpan, date){
     }
 }
 
-
+/**
+ *
+ * load one card about video information
+ * @param {*} result
+ * @param {*} cardnode
+ * @param {*} isNewVideo
+ */
 async function writeCard(result, cardnode, isNewVideo){
     var date = result.date; //*在这获取文件上传的日期
     var format = result.format;
     var note = result.note;
     var comment = result.ct; //*在这获取文件的评论
-    var commentby = result.ctby; //*在这获取文件的评论者
+    var id = result._id;
     await app.getTempFileURL({fileList:[result.fileID]})
     .then(function(res){
         //动态生成html元素并压入：
@@ -186,17 +220,22 @@ async function writeCard(result, cardnode, isNewVideo){
             sourcenode.setAttribute("type", "video/mp4");
             videonode.appendChild(sourcenode);
 
-            //生成Date format note 
+            //生成Date uploader format note 
             var hdatenode = document.createElement("p");
             hdatenode.innerText = date
             var spanbadge = document.createElement("span")
             spanbadge.className = "badge badge-secondary float-right"
             spanbadge.innerText = format
             hdatenode.appendChild(spanbadge)
+            var uploadbynode = document.createElement("p")
+            uploadbynode.style.fontSize = "12px"
+            uploadbynode.style.fontWeight = "700"
+            uploadbynode.innerHTML = "Uploaded by "+un
             var pnotenode = document.createElement("p")
             pnotenode.setAttribute("style","color:gray; height: 50px; word-break:break-all; overflow: hidden") 
             pnotenode.innerHTML = "Note: " + note
 
+            
             //comment button
             var buttonnode = document.createElement("button")
             if(isNewVideo)
@@ -211,13 +250,32 @@ async function writeCard(result, cardnode, isNewVideo){
             buttonnode.addEventListener("click", function(e){ 
                 e.preventDefault();
                 if(comment)
-                    comment_input.value = comment
+                {
+                    if(comment instanceof Array)
+                    {
+                        try
+                        {
+                            comment.forEach(function(commentObj)
+                            {
+                                if(commentObj.by == user){
+                                    comment_input.value = commentObj.content
+                                    throw new Error("end")
+                                }              
+                                else
+                                    comment_input.value = ""
+                            })
+                        }catch(e)
+                        {
+                            if(e.message!="end") throw e
+                        }
+                    }
+                }
                 else
                     comment_input.value = ""
-                $('#comment-button').click(function (e) { 
-                    e.preventDefault();
-                    e.preventDefault();
-                    giveComment(fileObj.fileID, un, comment_input.value)
+                $('#comment-button').unbind("click")
+                $('#comment-button').click(async function (e) { 
+                    e.preventDefault(); 
+                    await giveComment(fileObj.fileID, un, comment_input.value) 
                     $('#h-fileBox').empty(); 
                     $('#nv-fileBox').empty(); 
                     refreshFileBox(h_fileBoxList, h_fileNoticeSpan, false)
@@ -226,20 +284,42 @@ async function writeCard(result, cardnode, isNewVideo){
                 }, 
                 false);       
             
-            //inputnode.addEventListener("change", function(){giveComment(fileObj.fileID, un,inputnode.value)}, false);
-            //comment
-            var pcommentnode = document.createElement("p")
-            pcommentnode.setAttribute("style","height: 50px; word-break:break-all; overflow: hidden")
-            var strongnode = document.createElement("strong")
-            strongnode.innerText = "Comment: "
-            var textcommentnode=document.createTextNode(comment)
-            pcommentnode.appendChild(strongnode)
+            //comment - collapse box
+            var divcommentnode = document.createElement("div")
+            divcommentnode.innerText = "comment"
+            divcommentnode.className="text-right"
+            divcommentnode.style.color ="rgb(231, 49, 17)"
+            var icommentnode = document.createElement("i")
+            icommentnode.style.cursor = "pointer"
+            icommentnode.className = "icon fas fa-angle-double-down"
+            icommentnode.setAttribute("data-toggle", "collapse")
+            icommentnode.setAttribute("data-target", "#tcollapse" + id)
+            divcommentnode.appendChild(icommentnode)
+            var divcollapsenode = document.createElement("div")
+            var cardbodynode = document.createElement("div")
+            divcollapsenode.className = "collapse"
+            divcollapsenode.id = "tcollapse" + id
+            cardbodynode.className = "card card-body"
             if(comment)
-                pcommentnode.appendChild(textcommentnode)
+            {
+                if(comment instanceof Array)
+                {
+                    comment.forEach(function(commentObj)
+                    {
+                        var pcommentObjNode = document.createElement("p")
+                        pcommentObjNode.innerHTML =
+                            "<i style='width: 25px;' class='fas fa-user-circle'></i>" 
+                            + "<strong>"+commentObj.by+": </strong> "
+                            + commentObj.content;
+                        cardbodynode.appendChild(pcommentObjNode)                
+                    })
+                }
+            }
             else
-                pcommentnode.innerHTML = "No Comment"
+                cardbodynode.innerText = "No Comment yet"
+            divcollapsenode.appendChild(cardbodynode)
+        
         //生成外部div（idivnod ）
-
         var idivnode = document.createElement("div");
 
         //将以上所有元素压入idivnode，idivnode压入cardnode
@@ -247,17 +327,26 @@ async function writeCard(result, cardnode, isNewVideo){
             idivnode.appendChild(inode)
         idivnode.appendChild(videonode);
         idivnode.appendChild(hdatenode);
+        idivnode.appendChild(uploadbynode);
         idivnode.appendChild(pnotenode);
         idivnode.appendChild(buttonnode);
-        if(!isNewVideo)
-            idivnode.appendChild(pcommentnode);
-        cardnode.setAttribute("class","col-md-4 py-2");
+        idivnode.appendChild(divcommentnode);
+        idivnode.appendChild(divcollapsenode)
+
+            
         idivnode.setAttribute("class","border rounded-sm");
         idivnode.setAttribute("style","padding: 15px");
+        cardnode.setAttribute("class","col-md-4 py-2");
         cardnode.appendChild(idivnode);
     })
 }
 
+/**
+ *
+ * delete file
+ * @param {*} tfileID file ID 
+ * @param {*} tusername user name of collection
+ */
 function deleteFile(tfileID, tusername){
     //删除文件
     app.deleteFile({fileList:[tfileID]})
@@ -273,10 +362,37 @@ function deleteFile(tfileID, tusername){
     });       
 }
 
+/**
+ *
+ * give comment
+ * @param {*} tfileID file ID
+ * @param {*} tusername user name of collection
+ * @param {*} tcomment comment inputed
+ */
 async function giveComment(tfileID, tusername, tcomment){
-    await db.collection(tusername).where({type:"file", fileID:tfileID}).update({ct:tcomment, ctby:user, isCheck:true, isComment:true});
-}
+    var commentList;
+    var isHaveComment = false;
+    await db.collection(tusername).where({type:"file", fileID:tfileID}).get().then(res=>{
+        commentList = res.data[0].ct
+        if(commentList == null)
+        {
+            commentList = [{content:tcomment,by:user}]
+        }
+        else
+        {
+            commentList.forEach(function(comment){
+                if(comment.by == user){
+                    isHaveComment = true;
+                    comment.content = tcomment
+                }
+            })
+            if(isHaveComment == false)
+            commentList.push({content:tcomment,by:user})
+        }
+    })
 
+    await db.collection(tusername).where({type:"file", fileID:tfileID}).update({ct:commentList, isCheck:true, isComment:true});
+}
 
 //Jquery.new code (Date: 200929~)
 $(document).ready(function($){
@@ -294,15 +410,15 @@ var $h_filebox = $("#h-fileBox"),
         event.preventDefault()
         if($(event.target).is($tab_newvideo)) 
         {
-            $page_newvideo.show()
-            $page_history.hide()
+            $page_newvideo.fadeIn()
+            $page_history.fadeOut("slow")
             $tab_newvideo.addClass("active")
             $tab_history.removeClass("active")
         }
         else if($(event.target).is($tab_history))
         {
-            $page_newvideo.hide()
-            $page_history.show()
+            $page_newvideo.fadeOut()
+            $page_history.fadeIn("slow")
             $tab_newvideo.removeClass("active")
             $tab_history.addClass("active")
         }
@@ -319,7 +435,6 @@ var $h_filebox = $("#h-fileBox"),
         event.preventDefault()
         $h_filebox.empty()
         h_fileNoticeSpan.innerText = null
-        console.log(this.value)
         if(this.value.length==0)
         {
             refreshFileBox(h_fileBoxList, h_fileNoticeSpan, false)
