@@ -16,6 +16,8 @@ var helloUserName = document.getElementById("helloUserName");
 var fileInput = document.getElementById("file");
 var uploadButton = document.getElementById("upload");
 var noteInput = document.getElementById("Note");
+var rv_fileBoxList = document.getElementById("rv-fileBox");
+var rv_fileNoticeSpan = document.getElementById("rv-filenotice");
 var fileBoxList = document.getElementById("fileBox");
 var fileNoticeSpan = document.getElementById("filenotice");
 var nc_fileBoxList = document.getElementById("nc-fileBox");
@@ -86,9 +88,11 @@ function getCookie(cname){
 function checkCookieVideoList(){
     user = getCookie("username");
     helloUserName.innerHTML = "Hello! " + user;
-    const tempuserlist = ["temp01","temp02"];
+    const tempuserlist = ["temp01","temp02","temp03","temp04"];
     if (tempuserlist.indexOf(user) != -1){       //如果cookie中有记录用户名字则加载该用户的文件列表   
         userCollection = db.collection(user);
+        //showRecentVideo(rv_fileBoxList,rv_fileNoticeSpan,3);
+        refreshJumbotron()
         refreshVideoList(false,fileBoxList,fileNoticeSpan);
         refreshVideoList(true,nc_fileBoxList,nc_fileNoticeSpan);
     }
@@ -110,8 +114,11 @@ function deleteFile(tempfileID){
              //从该用户的集合删除形容该文件的文档
             userCollection.where({type:"file", fileID:tempfileID}).remove().then(res=>{
             $(".toast").eq(1).toast("show")
+            $("#rv-fileBox").empty();
             $("#fileBox").empty();
             $("#nc-fileBox").empty();
+            refreshJumbotron()
+            //showRecentVideo(rv_fileBoxList,rv_fileNoticeSpan,3);
             refreshVideoList(false,fileBoxList,fileNoticeSpan);
             refreshVideoList(true,nc_fileBoxList,nc_fileNoticeSpan);
         });
@@ -168,11 +175,14 @@ function upload(){
                     })
                     .then(res3=>{
                         $("#uploadProgress").css("width", "100%");
+                        refreshJumbotron()
                         setTimeout(function(){
                             progressDisplayDiv.className = "progress invisible"
                             $("#toast-body").text("Upload Success")
                             $(".toast").eq(0).toast("show")
+                            $("#rv-fileBox").empty();
                             $("#fileBox").empty()
+                            //showRecentVideo(rv_fileBoxList,rv_fileNoticeSpan,3);
                             refreshVideoList(false,fileBoxList,fileNoticeSpan)
                             },
                             1500);
@@ -253,6 +263,7 @@ function refreshVideoList(isNewCommentPage, tfileBoxList, tfileNoticeSpan){
         }
         else
         {   //开始读取文件
+            tfileNoticeSpan.innerText= null
             var temprownode = null;
 
             for(var i=0;i<res.data.length;i++)
@@ -283,11 +294,61 @@ function refreshVideoList(isNewCommentPage, tfileBoxList, tfileNoticeSpan){
                 }  
             }
         }
+
         if(num == -1 && isNewCommentPage == true)
         {
+            $("#hm-checknewcommentreminder").hide()
             tfileNoticeSpan.innerText="No new comment";
         }
+        else if(num > -1 && isNewCommentPage == true)
+        {   
+            $('[data-toggle="popover"]').popover('show')
+            $("#hm-checknewcommentreminder").show()
+        }
     });
+}
+
+function showRecentVideo(tfileBoxList, tfileNoticeSpan, showSize)
+{
+    const _ = db.command;   
+    userCollection.where({type:"file", fileID:_.neq(null)})
+    .get()
+    .then(function (res) {
+        if(res.data.length == 0){
+            tfileNoticeSpan.innerText="No recent video.";
+        }
+        else
+        {   //开始读取文件
+            var temprownode = null;
+            var num = 0;
+            var templength = Math.min(showSize,res.data.length)
+            for(var i=0;i<res.data.length;i++)
+            {    
+                if(i >=res.data.length - templength)
+                {
+                    var cardnode = document.createElement("div")
+
+                    writeCard(res.data[i],cardnode,false)
+                    
+                     //将一个文件内容压入 filebox
+                    if (num % 3 == 0) //如果为新的一行
+                    {
+                        var rownode = document.createElement("div");
+                        rownode.setAttribute("class","row");
+                        temprownode = rownode;
+                        temprownode.appendChild(cardnode);
+                        tfileBoxList.appendChild (temprownode);
+                    }
+                    else{
+                        var child = temprownode.children[0]
+                        temprownode.insertBefore(cardnode,child);                            
+                    } 
+                    
+                    num++
+                }
+            }
+        }
+    })
 }
 
 /**
@@ -367,7 +428,7 @@ async function writeCard(result, cardnode, isNewCommentPage)
             var buttonnode = document.createElement("button")
             buttonnode.innerText = "Confirm"  
             buttonnode.type = "button"
-            buttonnode.className = "btn btn-success btn-block btn-lg"
+            buttonnode.className = "btn btn-secondary btn-block btn-lg"
             buttonnode.style.textShadow = "black 2px 1px 1px"
             buttonnode.setAttribute("data-toggle","modal")
             buttonnode.setAttribute("data-target","#confirmModal")
@@ -404,7 +465,7 @@ async function writeCard(result, cardnode, isNewCommentPage)
 
             //Note
             var pnotenode = document.createElement("p")
-            pnotenode.setAttribute("style","height: 30px; word-break:break-all; overflow-y: scroll; scrollbar-width: none;") 
+            pnotenode.setAttribute("style","height: 30px; word-wrap:break-word; overflow-y: scroll; scrollbar-width: none;") 
             pnotenode.style.color = "gray"
             pnotenode.innerHTML = "Note: " + note;
             
@@ -413,7 +474,7 @@ async function writeCard(result, cardnode, isNewCommentPage)
             commenttagnode.innerHTML = "<strong>Comment</strong>";
             commenttagnode.style.marginBottom = "0";
             var divcommentnode = document.createElement("p");
-            divcommentnode.setAttribute("style","height: 80px; word-break:break-all; overflow-y: scroll; scrollbar-width: none") 
+            divcommentnode.setAttribute("style","height: 110px; word-wrap:break-word; overflow-y: scroll; scrollbar-width: none") 
             if(comment)
             {
                 if(comment instanceof Array)
@@ -453,52 +514,153 @@ async function writeCard(result, cardnode, isNewCommentPage)
     })
 }
 
+//control jumbotron
+function refreshJumbotron()
+{
+    $("#jb-hellouser").text("Hello," + user)
+    $("#jb-date").text("Today is " + getTodayDate())
+    checkifUploadToday()
+}
+function getTodayDate()
+{
+    var date = new Date();
+    var year = date.getFullYear(); //获取完整的年份(4位)
+    var day = date.getDate(); //获取当前日
+    var months = 
+        [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+        ];
+    if (day == 1 || day == 11 || day == 21 || day == 31) {
+        day = day + "(st)";
+    }
+    else if (day == 2 || day == 12 || day == 22)
+    {
+        day = day + "(nd)";
+    }
+    else if(day == 3 || day == 13 || day == 23)
+    {
+        day = day + "(rd)";
+    }
+    else
+    {
+        day = day + "(th)";
+    }
+    var currentdate = months[date.getMonth()] + " " + day +", " + year;
+    return currentdate;   
+}
+function checkifUploadToday()
+{
+    const _ = db.command;   
+    userCollection.where({type:"file", date:_.eq(getUploadDate())}).get()
+    .then(res=>{
+        if(res.data.length >0){
+            $("#jb-reminder").text("You have uploaded today's video report. Do not forget to upload next work day.")
+            $("#jb-bt").hide()
+        }
+        else
+        {
+            $("#jb-reminder").text("Please upload today's video report.")
+            $("#jb-bt").show()
+        }  
+    })  
+}
+
 
 //Jquery.new code (Date: 200927)
 $(document).ready(function($){
 var $h_filebox = $("#fileBox"),
+    $page_home = $("#cd-home"), 
     $page_upload = $("#cd-upload"),
     $page_newcomment = $("#cd-newcomment"),
     $page_history = $("#cd-history"),
     $tab_whole = $(".menu"),
-    $tab_upload = $tab_whole.children('li').eq(0),
-    $tab_newcomment = $tab_whole.children('li').eq(2),
-    $tab_history = $tab_whole.children('li').eq(4)
+    $tab_home = $tab_whole.children('li').eq(0),
+    $tab_upload = $tab_whole.children('li').eq(2),
+    $tab_newcomment = $tab_whole.children('li').eq(4),
+    $tab_history = $tab_whole.children('li').eq(6),
+    $jb_uploadbutton = $("#jb-bt"),
+    $hm_checknewcommentbutton = $("#hm-checknewcommentbt")
 
-    $page_upload.show()
+
+    $page_home.show()
+    $page_upload.hide()
     $page_newcomment.hide()
     $page_history.hide()
     //switch page from nav
     $tab_whole.on('click', function (event) {
         event.preventDefault()
-        if($(event.target).is($tab_upload)) 
+        if($(event.target).is($tab_home)) 
         {
-            $page_upload.fadeIn()
-            $page_newcomment.fadeOut()
-            $page_history.fadeOut()
-            $tab_upload.addClass("active")
-            $tab_newcomment.removeClass("active")
-            $tab_history.removeClass("active")
+            homeSelected()
+        }
+        else if($(event.target).is($tab_upload)) 
+        {
+            uploadSelected()
         }
         else if($(event.target).is($tab_newcomment))
         {
-            $page_upload.fadeOut()
-            $page_newcomment.fadeIn()
-            $page_history.fadeOut()
-            $tab_upload.removeClass("active")
-            $tab_newcomment.addClass("active")
-            $tab_history.removeClass("active")
+            newCommentSelected()
         }
         else if($(event.target).is($tab_history))
-        {
-            $page_upload.fadeOut()
-            $page_newcomment.fadeOut()
-            $page_history.fadeIn()
-            $tab_upload.removeClass("active")
-            $tab_newcomment.removeClass("active")
-            $tab_history.addClass("active")
+        {   
+            historySelected()
         }
     })
+
+    function homeSelected()
+    {
+        $page_home.fadeIn()
+        $page_upload.fadeOut()
+        $page_newcomment.fadeOut()
+        $page_history.fadeOut()
+        $tab_home.addClass("active")
+        $tab_upload.removeClass("active")
+        $tab_newcomment.removeClass("active")
+        $tab_history.removeClass("active")
+
+    }
+
+    function uploadSelected()
+    {
+        $page_home.fadeOut()
+        $page_upload.fadeIn()
+        $page_newcomment.fadeOut()
+        $page_history.fadeOut()
+        $tab_home.removeClass("active")
+        $tab_upload.addClass("active")
+        $tab_newcomment.removeClass("active")
+        $tab_history.removeClass("active")
+    }
+
+    function newCommentSelected()
+    {
+        $('[data-toggle="popover"]').popover('hide')
+        $('[data-toggle="popover"]').popover('disable')
+        $page_home.fadeOut()
+        $page_upload.fadeOut()
+        $page_newcomment.fadeIn()
+        $page_history.fadeOut()
+        $tab_home.removeClass("active")
+        $tab_upload.removeClass("active")
+        $tab_newcomment.addClass("active")
+        $tab_history.removeClass("active")
+    }
+
+    function historySelected()
+    {
+        $page_home.fadeOut()
+        $page_upload.fadeOut()
+        $page_newcomment.fadeOut()
+        $page_history.fadeIn()
+        $tab_home.removeClass("active")
+        $tab_upload.removeClass("active")
+        $tab_newcomment.removeClass("active")
+        $tab_history.addClass("active")
+    }
+
+    $jb_uploadbutton.on('click', uploadSelected)
+    $hm_checknewcommentbutton.on('click', newCommentSelected)
 
     //select date from calendar
     $("#datetimepicker").datetimepicker({
@@ -509,8 +671,13 @@ var $h_filebox = $("#fileBox"),
     //search by date
     $("#date-search").on('blur',function(event){ 
         event.preventDefault()
+        var temparray = this.value.split('-')
+        var day = temparray.pop()
+        var month = temparray.pop()
         $h_filebox.empty()
+        $h_filebox.prepend("<h2 style='color:grey'>"+month+'/'+day+"</h2>")
         fileNoticeSpan.innerHTML = null
+
         if(this.value.length==0)
         {
             refreshVideoList(false,fileBoxList,fileNoticeSpan)

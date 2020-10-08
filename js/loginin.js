@@ -30,7 +30,7 @@ function login(){
 	var pwd = md5(pwdInput.value);
 	
 	//avoid throw in Promise error when the 'uname' collection does not exist in tcb database
-	const tempuserlist = ["temp01","temp02","admin01","admin02"];      //edit when update user or admin collections in tcb database
+	const tempuserlist = ["temp01","temp02", "temp03","temp04","admin01","admin02"];      //edit when update user or admin collections in tcb database
 
 	//if user does not input ID or the ID is wrong, over this function
 	if(tempuserlist.indexOf(uname) == -1){
